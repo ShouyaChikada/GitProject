@@ -23,12 +23,21 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+
+	// セッター
 	void SetupVertexFog(DWORD Color, DWORD Mode, BOOL UseRange, FLOAT Density);
+
+	// ゲッター
 	LPDIRECT3DDEVICE9 GetDevice(void);
+	LPDIRECT3DTEXTURE9 GetTextureMT(void);
+
+	// ワイヤーフレーム用関数
 	void onWireFrame(void);
 	void offWireFrame(void);
+
+	// ターゲットチェンジ
 	void ChangeTarget(D3DXVECTOR3 posV, D3DXVECTOR3 posR, D3DXVECTOR3 vecU);
-	LPDIRECT3DTEXTURE9 GetTextureMT(void);
+
 
 private:
 	LPDIRECT3D9 m_pD3D;								//Direct3Dオブジェクトへのポインタ

@@ -288,8 +288,8 @@ void CRenderer::Draw(void)
 	LPDIRECT3DSURFACE9 pRenderWk = NULL;
 	LPDIRECT3DTEXTURE9 pTextureWk = NULL;
 
-	//CFade* pFade = CManager::GetFade();
-	//CScene* pScene = CManager::GetScene();
+	CFade* pFade = CManager::GetFade();
+	CScene* pScene = CManager::GetScene();
 	m_nCountFPS = GetFPS();
 
 	//バックバッファ
@@ -324,12 +324,12 @@ void CRenderer::Draw(void)
 		//オブジェクトすべての描画
 		CObject::DrawAll();
 
-		//pFade->Draw();
+		pFade->Draw();
 
-		//if (pScene != nullptr)
-		//{
-		//	pScene->Draw();
-		//}
+		if (pScene != nullptr)
+		{
+			pScene->Draw();
+		}
 
 		// FOGを消す
 		//m_pD3DDevice->SetRenderState(D3DRS_FOGENABLE, FALSE);		
@@ -495,12 +495,6 @@ void CRenderer::SetupVertexFog(DWORD Color, DWORD Mode, BOOL UseRange, FLOAT Den
 		m_pD3DDevice->SetRenderState(D3DRS_FOGDENSITY, *(DWORD*)(&Density));
 	}
 
-	// Enable range-based fog if desired (only supported for
-	//   vertex fog). For this example, it is assumed that UseRange
-	//   is set to a nonzero value only if the driver exposes the 
-	//   D3DPRASTERCAPS_FOGRANGE capability.
-	// Note: This is slightly more performance intensive
-	//   than non-range-based fog.
 	if (UseRange)
 		m_pD3DDevice->SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 }

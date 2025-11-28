@@ -10,6 +10,7 @@
 #include "modelmanager.h"
 #include "rock.h"
 #include "meshfield.h"
+#include "title.h"
 
 //静的メンバ変数
 CDebugProc* CManager::m_pDebugProc = nullptr;
@@ -21,6 +22,8 @@ CInputJoypad* CManager::m_pInputJoypad = nullptr;
 CInputMouse* CManager::m_pInputMouse = nullptr;
 CObject* CManager::m_pObject = nullptr;
 CTextureManager* CManager::m_pTexManager = nullptr;
+CFade* CManager::m_pFade = nullptr;
+CScene* CManager::m_pScene = nullptr;
 
 //コンストラクタ
 CManager::CManager()
@@ -43,68 +46,57 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		return E_FAIL;
 	}
 
-	m_pInputKeyboard = new CInputKeyboard;
 	//キーボードの初期化
+	m_pInputKeyboard = new CInputKeyboard;
 	if (FAILED(m_pInputKeyboard->Init(hInstance, hWnd)))
 	{
 		return E_FAIL;
 	}
 
-	m_pInputJoypad = new CInputJoypad;
 	//ジョイパッドの初期化処理
+	m_pInputJoypad = new CInputJoypad;
 	if (FAILED(m_pInputJoypad->Init()))
 	{
 		return E_FAIL;
 	}
 
+	// マウスの初期化
 	m_pInputMouse = new CInputMouse;
 	if (FAILED(m_pInputMouse->Init(hInstance,hWnd)))
 	{
 		return E_FAIL;
 	}
 
-	//// テクスチャマネージャーのロード
-	//m_pTexManager = new CTextureManager;
-	//if (FAILED(m_pTexManager->Load()))
-	//{
-	//	return E_FAIL;
-	//}
-
+	// カメラの初期化
 	m_pCamera = new CCamera;
-
 	if (m_pCamera != nullptr)
 	{
 		m_pCamera->Init();
 	}
 
+	// ライトの初期化
 	m_pLight = new CLight;
 	if (m_pLight != nullptr)
 	{
 		m_pLight->Init();
 	}
 
+	// デバッグフォントの初期化
 	m_pDebugProc = new CDebugProc;
 	if (m_pDebugProc != nullptr)
 	{
 		m_pDebugProc->Init();
 	}
 
-	// 球体
-	CRock::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\earth000.x", NULL);
 
-	// 床
-	CGrand::Create(D3DXVECTOR3(0.0f, -500.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	// フェードの初期化
+	m_pFade = new CFade;
 
-	CObjectX::Create(D3DXVECTOR3(0.0f, -600.0f, 0.0f), D3DXVECTOR3(0.0f, 1.57f, 0.0f), "data\\MODEL\\moon.x", 1.0f);
-
-	// メッシュドーム
-	//CMeshField::Create(D3DXVECTOR3(200.0f, -1100.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 50.0f);
-
-	//// フェードの生成
-	//m_pFade = new CFade;
-	//m_pFade->Init();
-
-	//m_pFade->SetFade(new CTitle());
+	if (m_pFade != nullptr)
+	{
+		m_pFade->Init();
+		m_pFade->SetFade(new CTitle());
+	}
 
 	return S_OK;
 }
@@ -172,13 +164,13 @@ void CManager::Uninit(void)
 		m_pLight = nullptr;
 	}
 
-	//if (m_pFade != nullptr)
-	//{	
-	//	// フェードの終了処理
-	//	m_pFade->Uninit();
-	//	delete m_pFade;
-	//	m_pFade = nullptr;
-	//}
+	if (m_pFade != nullptr)
+	{	
+		// フェードの終了処理
+		m_pFade->Uninit();
+		delete m_pFade;
+		m_pFade = nullptr;
+	}
 
 	// テクスチャマネージャーの破棄
 	CTextureManager::Instance()->Unload();
@@ -186,12 +178,16 @@ void CManager::Uninit(void)
 	// モデルマネージャーの破棄
 	CModelManager::Instance()->Unload();
 
-	//if (m_pScene != nullptr)
-	//{
-	//	m_pScene->Uninit();
-	//	delete m_pScene;
-	//	m_pScene = nullptr;
-	//}
+	if (m_pScene != nullptr)
+	{
+		m_pScene->Uninit();
+		delete m_pScene;
+		m_pScene = nullptr;
+	}
+
+	// すべてのオブジェクトの破棄
+	CObject::ReleaseAll();
+
 }
 
 //更新処理
@@ -227,147 +223,87 @@ void CManager::Update(void)
 		m_pLight->Update();
 	}
 
-	//if (m_pFade != nullptr)
-	//{
-	//	// フェードの更新処理
-	//	m_pFade->Update();
-	//}
+	if (m_pFade != nullptr)
+	{
+		// フェードの更新処理
+		m_pFade->Update();
+	}
 
-	//// null チェック
-	//if (m_pScene != nullptr)
-	//{
-	//	// シーンの更新処理
-	//	m_pScene->Update();
-	//}
+	// null チェック
+	if (m_pScene != nullptr)
+	{
+		// シーンの更新処理
+		m_pScene->Update();
+	}
 
 	if (m_pRenderer != nullptr)
 	{
 		// レンダラーの更新
 		m_pRenderer->Update();
 	}
-
 }
 
 // 描画処理
 void CManager::Draw()
 {
-	//CScene::MODE pMode;
-	//pMode = m_pScene->GetMode();
+	CScene::MODE pMode;
+	pMode = m_pScene->GetMode();
 
-	//CFade::FADE pFade;
-	//pFade = m_pFade->GetFadeState();
+	CFade::FADE pFade;
+	pFade = m_pFade->GetFadeState();
 
-	//if (m_pRenderer != nullptr)
-	//{
-	//	//レンダラーの描画
+	if (m_pRenderer != nullptr)
+	{
+		//レンダラーの描画
 		m_pRenderer->Draw();
 
-	//	if (pMode == m_pScene->MODE_TITLE)
-	//	{
-	//		CDebugProc::Print("現在のシーン:タイトル\n");
-	//	}
-	//	if (pMode == m_pScene->MODE_GAME)
-	//	{
-	//		CDebugProc::Print("現在のシーン:ゲーム\n");
-	//	}
-	//	if (pMode == m_pScene->MODE_RESULT)
-	//	{
-	//		CDebugProc::Print("現在のシーン:リザルト\n");
-	//	}
+		if (pMode == m_pScene->MODE_TITLE)
+		{
+			CDebugProc::Print("現在のシーン:タイトル\n");
+		}
+		if (pMode == m_pScene->MODE_GAME)
+		{
+			CDebugProc::Print("現在のシーン:ゲーム\n");
+		}
+		if (pMode == m_pScene->MODE_RESULT)
+		{
+			CDebugProc::Print("現在のシーン:リザルト\n");
+		}
 
-	//	if (pFade == m_pFade->FADE_IN)
-	//	{
-	//		CDebugProc::Print("現在のフェイド:フェイドイン\n");
-	//	}
+		if (pFade == m_pFade->FADE_IN)
+		{
+			CDebugProc::Print("現在のフェイド:フェイドイン\n");
+		}
 
-	//	if (pFade == m_pFade->FADE_OUT)
-	//	{
-	//		CDebugProc::Print("現在のフェイド:フェイドアウト\n");
-	//	}
-	//}
+		if (pFade == m_pFade->FADE_OUT)
+		{
+			CDebugProc::Print("現在のフェイド:フェイドアウト\n");
+		}
+	}
 }
 
 // モード設定
-//void CManager::SetMode(CScene* pNewScene)
-//{
-//	// サウンドの停止
-//	
-//	// シーンの破棄
-//	if (m_pScene != nullptr)
-//	{
-//		// 現在のモードを破棄
-//		m_pScene->Uninit();
-//		delete m_pScene;
-//		m_pScene = nullptr;
-//
-//		// すべてのオブジェクトの破棄
-//		CObject::ReleaseAll();
-//
-//	}
-//
-//	if (m_pScene == nullptr)
-//	{
-//		m_pScene = pNewScene;
-//		m_pScene->Init();
-//	}
-//
-//}
-
-//レンダラーの初期化
-CRenderer* CManager::GetRenderer(void) 
+void CManager::SetMode(CScene* pNewScene)
 {
-	return m_pRenderer;
-}
+	// サウンドの停止
+	
+	// シーンの破棄
+	if (m_pScene != nullptr)
+	{
+		// 現在のモードを破棄
+		m_pScene->Uninit();
+		delete m_pScene;
+		m_pScene = nullptr;
 
-//キーボードの取得
-CInputKeyboard* CManager::GetKeyboard(void)
-{
-	return m_pInputKeyboard;
-}
+		// すべてのオブジェクトの破棄
+		CObject::ReleaseAll();
 
-//パッドの取得
-CInputJoypad* CManager::GetJoypad(void)
-{
-	return m_pInputJoypad;
-}
+	}
 
-//マウスの取得
-CInputMouse* CManager::GetMouse(void)
-{
-	return m_pInputMouse;
-}
+	if (m_pScene == nullptr)
+	{
+		m_pScene = pNewScene;
+		m_pScene->Init();
+	}
 
-// オブジェクトの取得
-CObject* CManager::getobject(void)
-{
-	return m_pObject;
-}
-
-//CFade* CManager::GetFade()
-//{
-//	return m_pFade;
-//}
-
-// デバッグフォントの取得
-CDebugProc* CManager::GetDebugProc(void)
-{
-	return m_pDebugProc;
-}
-
-// カメラの取得
-CCamera* CManager::GetCamera(void)
-{
-	return m_pCamera;
-}
-
-// ライトの取得
-CLight* CManager::GetLight(void)
-{
-	return m_pLight;
-}
-
-// テクスチャマネージャーの取得
-CTextureManager* CManager::GetTexManager(void)
-{
-	return m_pTexManager;
 }

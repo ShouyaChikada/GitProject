@@ -17,6 +17,8 @@
 #include "camera.h"
 #include "light.h"
 #include "texturemanager.h"
+#include "fade.h"
+#include "scene.h"
 
 class CManager
 {
@@ -27,15 +29,22 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CCamera* GetCamera(void);
-	static CLight* GetLight(void);
-	static CDebugProc* GetDebugProc(void);
-	static CRenderer* GetRenderer(void);
-	static CInputKeyboard* GetKeyboard(void);
-	static CInputJoypad* GetJoypad(void);
-	static CInputMouse* GetMouse(void);
-	static CObject* getobject(void);
-	static CTextureManager* GetTexManager(void);
+
+	// ゲッター
+	static CCamera* GetCamera(void) { return m_pCamera; }
+	static CLight* GetLight(void) { return m_pLight; }
+	static CDebugProc* GetDebugProc(void) { return m_pDebugProc; }
+	static CRenderer* GetRenderer(void) { return m_pRenderer; }
+	static CInputKeyboard* GetKeyboard(void) { return m_pInputKeyboard; }
+	static CInputJoypad* GetJoypad(void) { return m_pInputJoypad; }
+	static CInputMouse* GetMouse(void) { return m_pInputMouse; }
+	static CObject* getobject(void) { return m_pObject; }
+	static CTextureManager* GetTexManager(void) { return m_pTexManager; }
+	static CFade* GetFade(void) { return m_pFade; }
+	static CScene* GetScene(void) { return m_pScene; }
+
+	// セッター
+	static void SetMode(CScene* pNewScene);
 
 private:
 	static CRenderer* m_pRenderer;				// レンダラーへのポインタ
@@ -47,6 +56,8 @@ private:
 	static CCamera* m_pCamera;					// カメラのポインタ
 	static CLight* m_pLight;					// ライトのポインタ
 	static CTextureManager* m_pTexManager;		// テクスチャマネージャのポインタ
+	static CFade* m_pFade;						// フェードへのポインタ
+	static CScene* m_pScene;					// シーンへのポインタ
 
 };
 #endif

@@ -146,6 +146,8 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="debugproc.cpp" />
+    <ClCompile Include="fade.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="jimen.cpp" />
     <ClCompile Include="light.cpp" />
@@ -160,20 +162,29 @@
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectx.cpp" />
+    <ClCompile Include="pause.cpp" />
+    <ClCompile Include="pauseanager.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="player.cpp" />
     <ClCompile Include="ranking.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="result.cpp" />
+    <ClCompile Include="resultmanager.cpp" />
     <ClCompile Include="rock.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="shadows.cpp" />
     <ClCompile Include="texturemanager.cpp" />
     <ClCompile Include="timer.cpp" />
+    <ClCompile Include="title.cpp" />
+    <ClCompile Include="titlemanager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="debugproc.h" />
+    <ClInclude Include="fade.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="jimen.h" />
     <ClInclude Include="light.h" />
@@ -188,14 +199,21 @@
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
     <ClInclude Include="objectx.h" />
+    <ClInclude Include="pause.h" />
+    <ClInclude Include="pausemanager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="ranking.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="result.h" />
+    <ClInclude Include="resultmanager.h" />
     <ClInclude Include="rock.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="shadows.h" />
     <ClInclude Include="texturemanager.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="title.h" />
+    <ClInclude Include="titlemanager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

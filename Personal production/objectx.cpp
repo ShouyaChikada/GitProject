@@ -134,6 +134,7 @@ HRESULT CObjectX::Init(void)
 	m_Size.y = m_VtxMax.y - m_VtxMin.y;	// sizeのy
 	m_Size.z = m_VtxMax.z - m_VtxMin.z;	// sizeのz
 
+
 	// アンロック
 	pMesh->UnlockVertexBuffer();
 
@@ -167,9 +168,9 @@ void CObjectX::Update(void)
 {
 	static float fAngle = 0.0f;
 
-	D3DXVECTOR3 Axis = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	D3DXVECTOR3 Axis = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	fAngle += 0.05f;
+	fAngle += 0.5f;
 
 	D3DXQuaternionRotationAxis(&m_Quat,&Axis,fAngle);
 }
@@ -196,6 +197,8 @@ void CObjectX::Draw(void)
 
 	// クォータニオンから回転マトリックスの作成
 	D3DXMatrixRotationQuaternion(&mtxRot, &m_Quat);
+
+	//D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
 
 	// 現在の回転量に次の回転量を加える
 	D3DXMatrixMultiply(&m_mtxRot, &m_mtxRot, &mtxRot);
