@@ -14,6 +14,15 @@
 class CObjectX :public CObject
 {
 public:
+
+	typedef enum
+	{
+		ROT_NONE = 0,
+		ROT_ON,
+		ROT_OFF,
+		ROT_MAX,
+	}ROT;
+
 	CObjectX(int nPriolty = 3);
 	~CObjectX();
 
@@ -21,7 +30,7 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CObjectX* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, float ValueRot);
+	static CObjectX* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, ROT Rotation);
 
 	// ゲッター
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
@@ -36,6 +45,7 @@ public:
 	void SetVecAxis(D3DXVECTOR3 VecAxis) { m_VecAxis = VecAxis; }
 	void SetValueRot(float fValueRot) { m_fValueRot = fValueRot; }
 	void SetIdx(std::string Path);
+	void SetRotaiton(ROT rotation) { m_Rotation = rotation; }
 
 private:
 	LPD3DXMESH m_pMesh;							// メッシュのポインタ
@@ -56,6 +66,7 @@ private:
 	float m_fValueRot;							// 回転角(回転量)
 	float m_Diff;								// 差分
 	int m_nIdx;									// モデルへのインデックス
-	float m_addRot;
+	float m_fAngle;								// 回転	
+	ROT m_Rotation;									// 回転用変数
 };
 #endif

@@ -20,11 +20,12 @@ CObjectX::CObjectX(int nPriolty):CObject(nPriolty)
 	m_dwNumMat = NULL;
 	m_FilePath = {};
 	m_fValueRot = NULL;
+	m_fAngle = NULL;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_VecAxis = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_VecAxis = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	m_Quat = D3DXQUATERNION(1.0f,1.0f,1.0f,1.0f);
 
 	//ワールドマトリックスの初期化
@@ -42,7 +43,7 @@ CObjectX::~CObjectX()
 //================================================
 // 生成
 //================================================
-CObjectX* CObjectX::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, float ValueRot)
+CObjectX* CObjectX::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, ROT rotation)
 {
 	CObjectX* pObjectX = nullptr;
 	pObjectX = new CObjectX;
@@ -52,8 +53,8 @@ CObjectX* CObjectX::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePat
 		pObjectX->m_pos = pos;
 		pObjectX->m_rot = rot;
 		pObjectX->m_FilePath = FilePath;
-		pObjectX->m_addRot = ValueRot;
 		pObjectX->SetIdx(FilePath);
+		pObjectX->SetRotaiton(rotation);
 		pObjectX->Init();
 		return pObjectX;
 	}
@@ -166,13 +167,15 @@ void CObjectX::Uninit(void)
 //================================================
 void CObjectX::Update(void)
 {
-	static float fAngle = 0.0f;
+	// 回転するなら
+	if (m_Rotation == ROT_ON)
+	{
+		D3DXVECTOR3 Axis = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
 
-	D3DXVECTOR3 Axis = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		m_fAngle = 0.0005f;
 
-	fAngle += 0.5f;
-
-	D3DXQuaternionRotationAxis(&m_Quat,&Axis,fAngle);
+		D3DXQuaternionRotationAxis(&m_Quat, &Axis, m_fAngle);
+	}
 }
 //================================================
 // 描画処理
@@ -192,13 +195,15 @@ void CObjectX::Draw(void)
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	// 回転軸のおける指定の回転角からクォータニオンを作成
-	D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
+	// 回転しないなら
+	if (m_Rotation != ROT_ON)
+	{
+		// 回転軸のおける指定の回転角からクォータニオンを作成
+		D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
+	}
 
 	// クォータニオンから回転マトリックスの作成
 	D3DXMatrixRotationQuaternion(&mtxRot, &m_Quat);
-
-	//D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
 
 	// 現在の回転量に次の回転量を加える
 	D3DXMatrixMultiply(&m_mtxRot, &m_mtxRot, &mtxRot);

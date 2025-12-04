@@ -13,7 +13,7 @@
 #include <string>
 
 // マクロ定義
-#define MAX_SPEED (4.0f)
+#define MAX_SPEED (5.0f)
 #define MAX_ROT (0.175f)
 
 // クラス
@@ -29,7 +29,7 @@ public:
 	void Draw(void);
 	void SetInput(D3DXVECTOR3 pos);
 
-	static CRock* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string Path, float fValue);
+	static CRock* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string Path, CObjectX::ROT rotation);
 
 private:
 	D3DXVECTOR3 m_rotDest;						// 目的の向き

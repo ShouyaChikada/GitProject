@@ -197,15 +197,15 @@ void CGrand::Update(void)
 
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	pVtx[0].tex = D3DXVECTOR2(aPosTexU, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(aPosTexU + 0.5f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(aPosTexU + 1.0f, 0.0f);
-	pVtx[3].tex = D3DXVECTOR2(aPosTexU, 0.5f);
-	pVtx[4].tex = D3DXVECTOR2(aPosTexU + 0.5f, 0.5f);
-	pVtx[5].tex = D3DXVECTOR2(aPosTexU + 1.0f, 0.5f);
-	pVtx[6].tex = D3DXVECTOR2(aPosTexU, 1.0f);
-	pVtx[7].tex = D3DXVECTOR2(aPosTexU + 0.5f, 1.0f);
-	pVtx[8].tex = D3DXVECTOR2(aPosTexU + 1.0f, 1.0f);
+	pVtx[0].tex = D3DXVECTOR2(0.0f, aPosTexU);
+	pVtx[1].tex = D3DXVECTOR2(0.5f, aPosTexU);
+	pVtx[2].tex = D3DXVECTOR2(1.0f, aPosTexU);
+	pVtx[3].tex = D3DXVECTOR2(0.0f, aPosTexU + 0.5f);
+	pVtx[4].tex = D3DXVECTOR2(0.5f, aPosTexU + 0.5f);
+	pVtx[5].tex = D3DXVECTOR2(1.0f, aPosTexU + 0.5f);
+	pVtx[6].tex = D3DXVECTOR2(0.0f, aPosTexU + 1.0f);
+	pVtx[7].tex = D3DXVECTOR2(0.5f, aPosTexU + 1.0f);
+	pVtx[8].tex = D3DXVECTOR2(1.0f, aPosTexU + 1.0f);
 	
 	m_pVtxBuff->Unlock();
 }

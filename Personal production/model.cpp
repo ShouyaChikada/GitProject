@@ -221,12 +221,9 @@ void CModel::Draw(void)
 
 		// テクスチャインデックスがあるとき
 		if (modelinfo.pTexture[nCntMat] != -1)
-		{
-			// テクスチャポインタ取得
-			CTextureManager* pTexture = CManager::GetTexManager();
-				
+		{				
 			//テクスチャ割り当て
-			pDevice->SetTexture(0, pTexture->GetAddress(modelinfo.pTexture[nCntMat]));
+			pDevice->SetTexture(0, CTextureManager::Instance()->GetAddress(modelinfo.pTexture[nCntMat]));
 		}
 		else
 		{

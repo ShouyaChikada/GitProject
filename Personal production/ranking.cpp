@@ -245,7 +245,7 @@ void CRanking::Change(void)
 			nData = nData / 10;
 			nData1 = nData1 / 10;
 
-			m_pNumber1[nCnt][nNum]->SetNumber(aPosTexU[nCnt], 4);
+			m_pNumber1[nCnt][nNum]->SetNumber(aPosTexU[nCnt]);
 		}
 
 		int aPosTexU1[MAX_TIMER] = {};
@@ -259,7 +259,7 @@ void CRanking::Change(void)
 			nData2 = nData2 / 10;
 			nData3 = nData3 / 10;
 
-			m_pNumber2[nCnt][nNum]->SetNumber(aPosTexU1[nCnt], 4);
+			m_pNumber2[nCnt][nNum]->SetNumber(aPosTexU1[nCnt]);
 		}
 	}
 
@@ -283,14 +283,14 @@ void CRanking::Change(void)
 		nData[0] = nData[0] / 10;
 		nData1[0] = nData1[0] / 10;
 
-		m_pNumber1[nCnt][MAX_NUM - 1]->SetNumber(aPosTexU[nCnt], 4);
+		m_pNumber1[nCnt][MAX_NUM - 1]->SetNumber(aPosTexU[nCnt]);
 
 		// 0”Ô–ÚˆÈŠO(•ª)
 		aPosTexU[nCnt] = (m_nMin[MAX_NUM - 1] % nData[1]) / nData1[1];
 		nData[1] = nData[1] / 10;
 		nData1[1] = nData1[1] / 10;
 
-		m_pNumber2[nCnt][MAX_NUM - 1]->SetNumber(aPosTexU[nCnt], 4);
+		m_pNumber2[nCnt][MAX_NUM - 1]->SetNumber(aPosTexU[nCnt]);
 	}
 	
 }
@@ -349,54 +349,54 @@ void CRanking::WriteFile(void)
 //****************************************************************
 void CRanking::InitNum(void)
 {
-	for (int nNum = 0; nNum < MAX_NUM - 1; nNum++)
-	{
-		for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
-		{
-			m_pNumber1[nCnt][nNum] = new CNumber;
+	//for (int nNum = 0; nNum < MAX_NUM - 1; nNum++)
+	//{
+	//	for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
+	//	{
+	//		m_pNumber1[nCnt][nNum] = new CNumber;
 
-			if (m_pNumber1[nCnt][nNum] != nullptr)
-			{
-				m_pNumber1[nCnt][nNum]->Init(650.0f, 650.0f, 300.0f, 350.0f, nCnt, nNum, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
-			}
+	//		if (m_pNumber1[nCnt][nNum] != nullptr)
+	//		{
+	//			m_pNumber1[nCnt][nNum]->Init(650.0f, 650.0f, 300.0f, 350.0f, nCnt, nNum, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
+	//		}
 
-			m_pNumber2[nCnt][nNum] = new CNumber;
+	//		m_pNumber2[nCnt][nNum] = new CNumber;
 
-			if (m_pNumber2[nCnt][nNum] != nullptr)
-			{
-				m_pNumber2[nCnt][nNum]->Init(520.0f, 520.0f, 300.0f, 350.0f, nCnt, nNum, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
-			}
-		}
+	//		if (m_pNumber2[nCnt][nNum] != nullptr)
+	//		{
+	//			m_pNumber2[nCnt][nNum]->Init(520.0f, 520.0f, 300.0f, 350.0f, nCnt, nNum, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
+	//		}
+	//	}
 
-		m_pNumber3[nNum] = new CNumber;
+	//	m_pNumber3[nNum] = new CNumber;
 
-		if (m_pNumber3[nNum] != nullptr)
-		{
-			m_pNumber3[nNum]->Init(615.0f, 665.0f, 300.0f, 350.0f, 0, nNum, 1.0f, 0.0f, 75.0f, 1, 0, "data\\TEXTURE\\coron.png", 1.0f);
-		}
-	}
+	//	if (m_pNumber3[nNum] != nullptr)
+	//	{
+	//		m_pNumber3[nNum]->Init(615.0f, 665.0f, 300.0f, 350.0f, 0, nNum, 1.0f, 0.0f, 75.0f, 1, 0, "data\\TEXTURE\\coron.png", 1.0f);
+	//	}
+	//}
 
-	for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
-	{
-		m_pNumber1[nCnt][MAX_NUM - 1] = new CNumber;
+	//for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
+	//{
+	//	m_pNumber1[nCnt][MAX_NUM - 1] = new CNumber;
 
-		if (m_pNumber1[nCnt][MAX_NUM - 1] != nullptr)
-		{
-			m_pNumber1[nCnt][MAX_NUM - 1]->Init(650.0f, 650.0f, 100.0f, 150.0f, nCnt, 0, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
-		}
+	//	if (m_pNumber1[nCnt][MAX_NUM - 1] != nullptr)
+	//	{
+	//		m_pNumber1[nCnt][MAX_NUM - 1]->Init(650.0f, 650.0f, 100.0f, 150.0f, nCnt, 0, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
+	//	}
 
-		m_pNumber2[nCnt][MAX_NUM - 1] = new CNumber;
+	//	m_pNumber2[nCnt][MAX_NUM - 1] = new CNumber;
 
-		if (m_pNumber2[nCnt][MAX_NUM - 1] != nullptr)
-		{
-			m_pNumber2[nCnt][MAX_NUM - 1]->Init(520.0f, 520.0f, 100.0f, 150.0f, nCnt, 0, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
-		}
-	}
+	//	if (m_pNumber2[nCnt][MAX_NUM - 1] != nullptr)
+	//	{
+	//		m_pNumber2[nCnt][MAX_NUM - 1]->Init(520.0f, 520.0f, 100.0f, 150.0f, nCnt, 0, 50.0f, 50.0f, 75.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
+	//	}
+	//}
 
-	m_pNumber3[MAX_NUM - 1] = new CNumber;
+	//m_pNumber3[MAX_NUM - 1] = new CNumber;
 
-	if (m_pNumber3[MAX_NUM - 1] != nullptr)
-	{
-		m_pNumber3[MAX_NUM - 1]->Init(615.0f, 665.0f, 100.0f, 150.0f, 0, 0, 1.0f, 0.0f, 75.0f, 1, 0, "data\\TEXTURE\\coron.png", 1.0f);
-	}
+	//if (m_pNumber3[MAX_NUM - 1] != nullptr)
+	//{
+	//	m_pNumber3[MAX_NUM - 1]->Init(615.0f, 665.0f, 100.0f, 150.0f, 0, 0, 1.0f, 0.0f, 75.0f, 1, 0, "data\\TEXTURE\\coron.png", 1.0f);
+	//}
 }

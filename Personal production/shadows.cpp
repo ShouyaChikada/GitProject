@@ -62,21 +62,10 @@ HRESULT CShadowS::Init (void)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	//í∏ì_ç¿ïWÇÃê›íË
-	pVtx[0].pos.x = 0.0f;
-	pVtx[0].pos.y = 0.0f;
-	pVtx[0].pos.z = 0.0f;
-
-	pVtx[1].pos.x = SCREEN_WIDTH;
-	pVtx[1].pos.y = 0.0f;
-	pVtx[1].pos.z = 0.0f;
-
-	pVtx[2].pos.x = 0.0f;
-	pVtx[2].pos.y = SCREEN_HEIGHT;
-	pVtx[2].pos.z = 0.0f;
-
-	pVtx[3].pos.x = SCREEN_WIDTH;
-	pVtx[3].pos.y = SCREEN_HEIGHT;
-	pVtx[3].pos.z = 0.0f;
+	pVtx[0].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pVtx[1].pos = D3DXVECTOR3(SCREEN_WIDTH, 0.0f, 0.0f);
+	pVtx[2].pos = D3DXVECTOR3(0.0f, SCREEN_HEIGHT, 0.0f);
+	pVtx[3].pos = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
 
 	// rhwÇÃê›íË
 	pVtx[0].rhw = 1.0f;

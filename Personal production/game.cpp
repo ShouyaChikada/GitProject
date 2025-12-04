@@ -9,6 +9,8 @@
 #include "manager.h"
 #include "result.h"
 #include "rock.h"
+#include "timer.h"
+#include "enemy.h"
 
 // 静的メンバ変数
 CPlayer* CGame::m_pPlayer = nullptr;
@@ -47,18 +49,22 @@ HRESULT CGame::Init(void)
 		return E_FAIL;
 	}
 
-	// 球体
-	CRock::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\earth000.x", NULL);
+	// 地球
+	CRock::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\earth000.x", CObjectX::ROT_OFF);
 
 	// 床
 	CGrand::Create(D3DXVECTOR3(0.0f, -500.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	CObjectX::Create(D3DXVECTOR3(0.0f, -1500.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\moon.x", 1.0f);
+	// 月
+	CObjectX::Create(D3DXVECTOR3(0.0f, -1900.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\moon.x", CObjectX::ROT_ON);
 
 	// メッシュドーム
 	//CMeshField::Create(D3DXVECTOR3(200.0f, -1100.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 50.0f);
 
+	// タイム
+	CTimer::Create(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 
+	CEnemy::Create(D3DXVECTOR3(0.0f, 10.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	return S_OK;
 }
 

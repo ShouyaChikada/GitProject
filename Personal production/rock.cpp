@@ -34,7 +34,7 @@ CRock::~CRock()
 //=================================================
 // ¶¬
 //=================================================
-CRock* CRock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, float fValue)
+CRock* CRock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, CObjectX::ROT rotation)
 {
 	CRock* pRock = nullptr;
 	pRock = new CRock;
@@ -44,7 +44,7 @@ CRock* CRock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, flo
 		pRock->SetPosition(pos);
 		pRock->SetRot(D3DXToRadian(rot));
 		pRock->SetIdx(FilePath);
-		pRock->SetValueRot(fValue);
+		pRock->SetRotaiton(rotation);
 		pRock->Init();
 		return pRock;
 	}

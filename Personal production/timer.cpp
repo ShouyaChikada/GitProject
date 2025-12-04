@@ -25,7 +25,6 @@ CTimer::CTimer(int nPriority) : CObject(nPriority)
 	m_nNs = NULL;
 	m_nMin = NULL;
 	m_nHour = NULL;
-	Init();
 }
 
 //****************************************************************
@@ -47,9 +46,7 @@ CTimer* CTimer::Create(D3DXVECTOR3 pos)
 	if (pTimer != nullptr)
 	{
 		pTimer->m_pos = pos;
-
 		pTimer->Init();
-
 		return pTimer;
 	}
 	else
@@ -68,20 +65,22 @@ HRESULT CTimer::Init(void)
 	m_nTimer = 0;
 	m_nHour = 0;
 
+	float fAdd = 50.0f;
+
 	for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
 	{
 		m_pNumber1[nCnt] = new CNumber;
 
 		if (m_pNumber1[nCnt] != nullptr)
 		{
-			m_pNumber1[nCnt]->Init(200.0f, 200.0f, 0.0f, 50.0f, nCnt, 0, 50.0f, 50.0f, 0.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
+			m_pNumber1[nCnt]->Init(200.0f, nCnt, fAdd, "data\\TEXTURE\\number005.png", CNumber::NUM_TIME);
 		}
 
 		m_pNumber2[nCnt] = new CNumber;
 
 		if (m_pNumber2[nCnt] != nullptr)
 		{
-			m_pNumber2[nCnt]->Init(50.0f, 50.0f, 0.0f, 50.0f, nCnt, 0, 50.0f, 50.0f, 0.0f, MAX_TIMER, 4, "data\\TEXTURE\\number005.png", 0.1f);
+			m_pNumber2[nCnt]->Init(50.0f, nCnt, fAdd, "data\\TEXTURE\\number005.png", CNumber::NUM_TIME);
 		}
 	}
 
@@ -89,7 +88,7 @@ HRESULT CTimer::Init(void)
 
 	if (m_pNumber3 != nullptr)
 	{
-		m_pNumber3->Init(150.0f, 200.0f, 0.0f, 50.0f ,0, 0, 1.0f, 0.0f, 0.0f, 1, 0, "data\\TEXTURE\\coron.png", 1.0f);
+		m_pNumber3->Init(150.0f, NULL, NULL, "data\\TEXTURE\\coron.png", CNumber::NUM_SCORE);
 	}
 
 	return S_OK;
@@ -186,7 +185,6 @@ void CTimer::Draw(void)
 		m_pNumber1[nCnt]->Draw();
 		m_pNumber2[nCnt]->Draw();
 	}
-
 	m_pNumber3->Draw();
 }
 
@@ -224,7 +222,7 @@ void CTimer::SubNs(int nValue)
 		nData = nData / 10;
 		nData1 = nData1 / 10;
 
-		m_pNumber1[nCnt]->SetNumber(aPosTexU[nCnt], 4);
+		m_pNumber1[nCnt]->SetNumber(aPosTexU[nCnt]);
 	}
 }
 
@@ -246,7 +244,7 @@ void CTimer::SubMin(int nValue)
 		nData = nData / 10;
 		nData1 = nData1 / 10;
 
-		m_pNumber2[nCnt]->SetNumber(aPosTexU[nCnt], 4);
+		m_pNumber2[nCnt]->SetNumber(aPosTexU[nCnt]);
 	}
 }
 
