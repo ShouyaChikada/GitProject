@@ -201,7 +201,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\taiya.jpg";
+    "data\\TEXTURE\\taiya.jpg";
    }
   }
   Material {
@@ -228,7 +228,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\face.jpg";
+    "data\\TEXTURE\\face.jpg";
    }
   }
   Material {

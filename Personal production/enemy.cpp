@@ -28,7 +28,6 @@ CEnemy::CEnemy(int nPriority) : CObject(nPriority)
 	for (int nCnt = 0; nCnt < MAX_EMODEL; nCnt++)
 	{
 		m_apModel[nCnt] = nullptr;
-
 	}
 	m_pMotion = nullptr;
 }
@@ -51,7 +50,7 @@ CEnemy* CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	if (pEnemy != nullptr)
 	{
-		pEnemy->SetPosition(pos);
+		pEnemy->m_pos = pos;
 		pEnemy->m_rot = rot;
 		pEnemy->Init();
 		return pEnemy;
@@ -107,6 +106,12 @@ void CEnemy::Uninit(void)
 //============================
 void CEnemy::Update(void)
 {
+	// モーションの更新
+	m_pMotion->Update(&m_apModel[0]);
+
+	// 移動のモーション
+	m_pMotion->Set(CMotion::MOTIONTYPE_NEUTRAL);
+
 	//角度の正規化
 	if (m_rot.y < -D3DX_PI)
 	{
@@ -142,19 +147,10 @@ void CEnemy::Update(void)
 	//前回の位置を保存	位置更新の上で書く
 	m_posOld = m_pos;
 
-
+	// 位置を移動
 	m_pos += m_move;
 
-	// 移動の制限
-	if (m_pos.y > 800.0f || m_pos.x > 2500.0f || m_pos.z > 2500.0f)
-	{
-		m_pos = m_posOld;
-	}
-	else if (m_pos.y < -180.0f || m_pos.x < -2500.0f || m_pos.z < -2500.0f)
-	{
-		m_pos = m_posOld;
-	}
-
+	// 位置の設定
 	SetPosition(m_pos);
 }
 
@@ -163,28 +159,6 @@ void CEnemy::Update(void)
 //============================
 void CEnemy::Draw(void)
 {
-	//デバイス取得
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
-
-	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリックス
-	D3DMATERIAL9 matDef; //現在のマテリアル保存用
-
-	//ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&m_mtxWorld);
-
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
-
-	//現在のマテリアルを取得
-	pDevice->GetMaterial(&matDef);
 
 	//モデルパーツを描画
 	for (int nCnt = 0; nCnt < MAX_EMODEL; nCnt++)
@@ -192,9 +166,8 @@ void CEnemy::Draw(void)
 		m_apModel[nCnt]->Draw();
 	}
 
-	//保存していたマテリアルを隠す
-	pDevice->SetMaterial(&matDef);
-
+	// デバッグフォントの表示
 	CDebugProc::Print("EnemyPos : { %.2f,%.2f,%.2f }\n", m_pos.x, m_pos.y, m_pos.z);
 
 }
+

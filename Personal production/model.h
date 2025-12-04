@@ -15,11 +15,11 @@ public:
 
 	CModel();
 	~CModel();
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
+	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CModel* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string Path);
+	static CModel* Create(std::string Path);
 
 	// ÉQÉbÉ^Å[
 	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }

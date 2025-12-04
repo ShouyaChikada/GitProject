@@ -70,13 +70,15 @@ public:
 	~CMotion();
 	HRESULT Init(const char* txt,CModel **ppModel);
 	void Uninit(void);
-	void Set(MOTIONTYPE nType);
 	void Update(CModel** ppModel);
-	int GetType(void);
-	//bool bFinish(void);
-	void SetInfo(INFO info);
-	void SetModel(const char* txt,CModel** ppModel);
 	static CMotion* Create(const char* txt, CModel** ppModel);
+
+	// ゲッター
+	int GetType(void) { return m_nType; }
+	
+	// セッター
+	void Set(MOTIONTYPE nType) { MotionType = nType; }
+
 private:
 	D3DXVECTOR3 pos;
 	int nCounterState;

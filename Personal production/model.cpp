@@ -10,19 +10,25 @@
 #include "texturemanager.h"
 #include "modelmanager.h"
 
+//=================================================
+// 静的メンバ変数
+//=================================================
 D3DXVECTOR3 CModel::m_Size = {};
+
+//=================================================
 // コンストラクタ
+//=================================================
 CModel::CModel()
 {
 	m_nIdx = NULL;
-	m_pParent = NULL;
+	m_pParent = nullptr;
 
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_VtxMax = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_VtxMin = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	//ワールドマトリックスの初期化
@@ -31,37 +37,40 @@ CModel::CModel()
 
 }
 
+//=================================================
 // デストラクタ
+//=================================================
 CModel::~CModel()
 {
 
 }
 
+//=================================================
 // 生成
-CModel* CModel::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string Path)
+//=================================================
+CModel* CModel::Create(std::string Path)
 {
 	CModel* pModel = nullptr;
 	pModel = new CModel;
+
 	if (pModel != nullptr)
 	{
-		pModel->Init(pos, rot);
 		pModel->SetIdx(Path);
+		pModel->Init();
 		return pModel;
 	}
 	else
 	{
 		return nullptr;
 	}
-		//}
-	//return NULL;
 }
 
-//================================
+//=================================================
 // 初期化処理
-//================================
-HRESULT CModel::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+//=================================================
+HRESULT CModel::Init(void)
 {
-	
+	// モデルマネージャーのインスタンス
 	CModelManager* pModelTexManager = CModelManager::Instance();
 	CModelManager::ModelInfo modelinfo = pModelTexManager->GetAddress(m_nIdx);
 
@@ -80,6 +89,7 @@ HRESULT CModel::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	// 頂点バッファをロック
 	pMesh->LockVertexBuffer(D3DLOCK_READONLY, (void**)&pVtxBuff);
+
 	// 頂点数分回す
 	for (int nCntBlock = 0; nCntBlock < nNumVtx; nCntBlock++)
 	{
@@ -130,27 +140,31 @@ HRESULT CModel::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	// アンロック
 	pMesh->UnlockVertexBuffer();
+
 	return S_OK;
 }
-//================================
+
+//=================================================
 // 終了処理
-//================================
+//=================================================
 void CModel::Uninit(void)
 {
 
 }
-//================================
+
+//=================================================
 // 更新処理
-//================================
+//=================================================
 void CModel::Update(void)
 {
 	//前回の位置を保存	位置更新の上で書く
-	m_posOld = m_pos;
+	//m_posOld = m_pos;
 
 }
-//================================
+
+//=================================================
 // 描画処理
-//================================
+//=================================================
 void CModel::Draw(void)
 {
 	//デバイス取得
@@ -166,8 +180,6 @@ void CModel::Draw(void)
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
-
-	//ワールドマトリックスの初期化
 
 	// 回転軸のおける指定の回転角からクォータニオンを作成
 	D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
@@ -240,9 +252,9 @@ void CModel::Draw(void)
 
 }
 
-//================================================
+//=================================================
 // インデックスを設定
-//================================================
+//=================================================
 void CModel::SetIdx(std::string Path)
 {
 	m_nIdx = CModelManager::Instance()->Register(Path);

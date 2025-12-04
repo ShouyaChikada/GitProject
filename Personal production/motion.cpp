@@ -10,27 +10,28 @@
 #include "stdio.h"
 #include "manager.h"
 
+//=================================================
 // コンストラクタ
+//=================================================
 CMotion::CMotion()
 {
-	m_PartsCount = 0;
-	m_Loop = 0;
-	m_nMotion = 0;
-	m_nKey = 0;
-	m_nCount = 0;
-	m_nNumKey = 0;
-	m_nFrame = 0;
+	m_PartsCount = NULL;
+	m_Loop = NULL;
+	m_nMotion = NULL;
+	m_nKey = NULL;
+	m_nCount = NULL;
+	m_nNumKey = NULL;
+	m_nFrame = NULL;
 
 	for (int nCnt = 0; nCnt < MAX_MOTIONINFO; nCnt++)
 	{
 		m_aMotionLoop[nCnt] = false;
-
 	}
 
 	for (int nCnt = 0; nCnt < NUM_MOTION; nCnt++)
 	{
 		m_aInfo[nCnt].m_bLoop = true;
-		m_aInfo[nCnt].m_nNumKey = 0;
+		m_aInfo[nCnt].m_nNumKey = NULL;
 
 	}
 
@@ -39,23 +40,27 @@ CMotion::CMotion()
 	MotionType = MOTIONTYPE_NEUTRAL;
 	bJump = false;
 	bUse = false;
-
-	m_nCounterMotion = 0;
-	m_nNext = 0;
-	m_nType = 0;
 	m_ppModel = nullptr;
+
+	m_nCounterMotion = NULL;
+	m_nNext = NULL;
+	m_nType = NULL;
 	nCounterState = 0;
-	nNumAll = 0;
-	m_nNumModel = 0;
+	nNumAll = NULL;
+	m_nNumModel = NULL;
 }
 
+//=================================================
 // デストラクタ
+//=================================================
 CMotion::~CMotion()
 {
 
 }
 
+//=================================================
 // モーションの生成
+//=================================================
 CMotion* CMotion::Create(const char* txt, CModel** ppModel)
 {
 	CMotion* pMotion = nullptr;
@@ -72,57 +77,68 @@ CMotion* CMotion::Create(const char* txt, CModel** ppModel)
 	}
 }
 
+//=================================================
 // モーションの破棄
+//=================================================
 void CMotion::Uninit(void)
 {
 
 }
 
+//=================================================
+// 初期化
+//=================================================
 HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 {
 	FILE* pFile;
-	LPDIRECT3DDEVICE9 pD3DDevice = CManager::GetRenderer()->GetDevice();
 
-	int nCnt = 0;
-
+	// ローカル変数
 	D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	int nIdxModelParent = 0;
-	int ModelCount = 0,Index = 0;
-	int nMotion = 0, nCount = 0, nKey = 0;
-	char omit[3];
+	int nCnt = NULL;
+	int nIdxModelParent = NULL;
+	int ModelCount = NULL,Index = NULL;
+	int nMotion = NULL, nCount = NULL, nKey = NULL;
+	char omit[3] = {};
 
+	// ファイルオープン
 	pFile = fopen(txt, "r");
 
+	// ファイルポインタに情報が入っていたら
 	if (pFile != nullptr)
 	{
-		char aStr[256];
+		char aStr[256] = {};
+
 		while (1)
 		{
+			// 文字の読み込み
 			fscanf(pFile, "%s", &aStr[0]);
 			//ストラコンプ（読み込んだ文字が一致したら)
 			if (strcmp(aStr, "SCRIPT") == 0)
 			{
-				fscanf(pFile, "%s", &aStr[0]);
-
 				while (1)
 				{
+					// 文字の読み込み
 					fscanf(pFile, "%s", &aStr[0]);
 
 					if (strcmp(aStr, "NUM_MODEL") == 0)
 					{
+						// (=)の除去
 						fscanf(pFile, "%s", &omit[0]);
 						fscanf(pFile, "%d", &m_nNumModel);
 					}
 					else if (strcmp(aStr, "MODEL_FILENAME") == 0)
 					{
+						// (=)の除去
 						fscanf(pFile, "%s", &omit[0]);
+
+						// 文字の読み込み
 						fscanf(pFile, "%s", &aStr[0]);
 
 						const char* MODELFILE = {};
 						MODELFILE = aStr;
 
-						ppModel[nCnt] = CModel::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), MODELFILE);
+						ppModel[nCnt] = CModel::Create(MODELFILE);
 
 						nCnt++;
 					}
@@ -130,11 +146,12 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 					{
 						while (1)
 						{
-
+							// 文字の読み込み
 							fscanf(pFile, "%s", &aStr[0]);
 
 							if (strcmp(aStr, "NUM_PARTS") == 0)
 							{
+								// (=)の除去
 								fscanf(pFile, "%s", &omit[0]);
 								fscanf(pFile, "%d", &m_nNumModel);
 							}
@@ -142,15 +159,18 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 							{
 								while (1)
 								{
+									// 文字の読み込み
 									fscanf(pFile, "%s", &aStr[0]);
 
 									if (strcmp(aStr, "INDEX") == 0)
 									{
+										// (=)の除去
 										fscanf(pFile, "%s", &omit[0]);
 										fscanf(pFile, "%d", &Index);
 									}
 									else if (strcmp(aStr, "PARENT") == 0)
 									{
+										// (=)の除去
 										fscanf(pFile, "%s", &omit[0]);
 										fscanf(pFile, "%d", &nIdxModelParent);
 										if (nIdxModelParent == -1)
@@ -165,6 +185,7 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 
 									else if (strcmp(aStr, "POS") == 0)
 									{
+										// 文字の読み込み
 										fscanf(pFile, "%s", &omit[0]);
 										fscanf(pFile, "%f", &pos.x);
 										fscanf(pFile, "%f", &pos.y);
@@ -174,6 +195,7 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 									}
 									else if (strcmp(aStr, "ROT") == 0)
 									{
+										// 文字の読み込み
 										fscanf(pFile, "%s", &omit[0]);
 										fscanf(pFile, "%f", &rot.x);
 										fscanf(pFile, "%f", &rot.y);
@@ -195,18 +217,20 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 					}
 					else if (strcmp(aStr, "MOTIONSET") == 0)
 					{
-
 						while (1)
 						{
+							// 文字の読み込み
 							fscanf(pFile, "%s", &aStr[0]);
 
 							if (strcmp(aStr, "LOOP") == 0)
 							{
+								// 文字の読み込み
 								fscanf(pFile, "%s", &omit[0]);
 								fscanf(pFile, "%d", &m_aInfo[nMotion].m_bLoop);
 							}
 							else if (strcmp(aStr, "NUM_KEY") == 0)
 							{
+								// 文字の読み込み
 								fscanf(pFile, "%s", &omit[0]);
 								fscanf(pFile, "%d", &m_aInfo[nMotion].m_nNumKey);
 							}
@@ -216,10 +240,12 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 
 								while (1)
 								{
+									// 文字の読み込み
 									fscanf(pFile, "%s", &aStr[0]);
 
 									while (1)
 									{
+										// 文字の読み込み
 										fscanf(pFile, "%s", &aStr[0]);
 
 										if (strcmp(aStr, "FRAME") == 0)
@@ -233,16 +259,14 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 
 									while (1)
 									{
+										// 文字の読み込み
 										fscanf(pFile, "%s", &aStr[0]);
 
 										if (strcmp(aStr, "KEY") == 0)
 										{
-											fscanf(pFile, "%s", &aStr[0]);
-											//fscanf(pFile, "%s", &omit[0]);
-											//fscanf(pFile, "%d", &pPlayer->aMotioninfo[nMotion].aKeyInfo[nKey].aKey);
-
 											while (1)
 											{
+												// 文字の読み込み
 												fscanf(pFile, "%s", &aStr[0]);
 
 												if (strcmp(aStr, "POS") == 0)
@@ -304,10 +328,15 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 		}
 	}
 
+	// ファイルを閉じる
 	fclose(pFile);
+
 	return S_OK;
 }
 
+//=================================================
+// 更新
+//=================================================
 void CMotion::Update(CModel** ppModel)
 {
 	KEY Diff, Value;//差と値
@@ -315,7 +344,6 @@ void CMotion::Update(CModel** ppModel)
 	//全モデル(パーツ)の更新
 	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
 	{
-
 		//次のモーション
 		m_nNext = (m_nKey + 1) % m_aInfo[MotionType].m_nNumKey;
 
@@ -343,8 +371,10 @@ void CMotion::Update(CModel** ppModel)
 		//ppModel[nCntModel]->SetPos(D3DXVECTOR3(Value.m_fPosX, Value.m_fPosY, Value.m_fPosZ));
 		ppModel[nCntModel]->SetRot(D3DXVECTOR3(Value.m_fRotX, Value.m_fRotY, Value.m_fRotZ));
 	}
+
 	//モーションを動かす
 	m_nCounterMotion++;
+
 	//カウンターモーションのリセット処理
 	if (m_nCounterMotion >= m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame)
 	{
@@ -362,14 +392,4 @@ void CMotion::Update(CModel** ppModel)
 			m_nNext = 0;	
 		}
 	}
-}
-
-int CMotion::GetType(void)
-{
-	return m_nType;
-}
-
-void CMotion::Set(MOTIONTYPE nType)
-{
-	MotionType = nType;
 }

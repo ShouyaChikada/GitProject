@@ -49,7 +49,7 @@
 #define MAX_TEXTURE (128)															//テクスチャの最大数
 #define MAX_BLOCK (128)																//ブロックの最大数
 #define MAX_MODEL (32)																// 最大モデル数
-#define MAX_PMODEL (16)																//プレイヤーの最大モデル数
+#define MAX_PMODEL (15)																//プレイヤーの最大モデル数
 #define MAX_HMODEL (15)																//人の最大モデル数
 
 typedef struct

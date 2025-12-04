@@ -8,6 +8,7 @@
 #include "manager.h"
 #include "texturemanager.h"
 #include "modelmanager.h"
+#include "debugproc.h"
 
 //=================================================
 // コンストラクタ
@@ -17,7 +18,7 @@ CRock::CRock(int nPriolty) :CObjectX(nPriolty)
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Diff = NULL;
 
 	m_pShadowS = nullptr;
@@ -81,7 +82,7 @@ void CRock::Update(void)
 	D3DXVECTOR3 rot = GetRot();
 
 	//移動とモーションのセット
-	SetInput(pos);
+	//SetInput(pos);
 
 	//角度の調整
 	m_Diff = m_rotDest.y - rot.y;
@@ -110,6 +111,8 @@ void CRock::Update(void)
 	m_move.z += (0.0f - m_move.z) * 0.5f;
 
 	m_pShadowS->SetShadow(pos, rot);
+
+	m_pos = pos;
 }
 //=================================================
 // 描画処理
@@ -117,6 +120,8 @@ void CRock::Update(void)
 void CRock::Draw(void)
 {
 	CObjectX::Draw();
+
+	CDebugProc::Print("Rock : { %.2f,%.2f,%.2f }\n", m_pos.x, m_pos.y, m_pos.z);
 }
 
 //=================================================

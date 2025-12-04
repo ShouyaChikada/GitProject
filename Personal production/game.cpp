@@ -12,7 +12,9 @@
 #include "timer.h"
 #include "enemy.h"
 
+//=================================================
 // 静的メンバ変数
+//=================================================
 CPlayer* CGame::m_pPlayer = nullptr;
 CObject3D* CGame::m_pObject3D = nullptr;
 CObjectX* CGame::m_pObjectX = nullptr;
@@ -24,19 +26,25 @@ CPauseManager* CGame::m_pPauseManager = nullptr;
 CModel* CGame::m_pModel1[MAX_HMODEL] = {};
 bool CGame::m_bCheck = false;
 
+//=================================================
 // コンストラクタ
+//=================================================
 CGame::CGame() : CScene(CScene::MODE_GAME)
 {
 
 }
 
+//=================================================
 // デストラクタ
+//=================================================
 CGame::~CGame()
 {
 
 }
 
+//=================================================
 // 初期化
+//=================================================
 HRESULT CGame::Init(void)
 {
 	//m_pMotion1 = CMotion::Create("data\\human.txt", &m_pModel1[0]);	//whichMotion.txt || motion2.txt
@@ -64,11 +72,14 @@ HRESULT CGame::Init(void)
 	// タイム
 	CTimer::Create(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 
-	CEnemy::Create(D3DXVECTOR3(0.0f, 10.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	//	敵
+	CPlayer::Create(D3DXVECTOR3(0.0f, 10.0f, 100.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	return S_OK;
 }
 
+//=================================================
 // 終了処理
+//=================================================
 void CGame::Uninit(void)
 {
 	if (m_pPauseManager != nullptr)
@@ -81,7 +92,9 @@ void CGame::Uninit(void)
 
 }
 
+//=================================================
 // 更新処理
+//=================================================
 void CGame::Update(void)
 {
 	// キーボード
@@ -114,55 +127,10 @@ void CGame::Update(void)
 	}
 }
 
+//=================================================
 // 描画処理
+//=================================================
 void CGame::Draw(void)
 {
 
-}
-
-// プレイヤーの取得
-CPlayer* CGame::GetPlayer(void)
-{
-	return m_pPlayer;
-}
-
-// ライトの取得
-CObject3D* CGame::GetObject3D(void)
-{
-	return m_pObject3D;
-}
-
-// オブジェクトXの取得
-CObjectX* CGame::GetObjectX(void)
-{
-	return m_pObjectX;
-}
-
-// メッシュフィールドの取得
-CMeshField* CGame::GetMeshField(void)
-{
-	return m_pMeshField;
-}
-
-// 影の取得
-CShadowS* CGame::GetShadowS(void)
-{
-	return m_pShadowS;
-}
-
-// 地面の取得
-CGrand* CGame::GetGrand(void)
-{
-	return m_pGrand;
-}
-
-// タイムの取得
-CTimer* CGame::GetTime(void)
-{
-	return m_pTime;
-}
-
-CModel** CGame::GetModel1(void)
-{
-	return &m_pModel1[0];
 }

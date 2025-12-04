@@ -26,15 +26,17 @@ public:
 
 	}ModelInfo;
 
+	CModelManager();
 	~CModelManager();
 	HRESULT Load(std::string sName);
-	void ReCalcNormalize(const int Indx);
 	void Unload(void);
 	int Register(std::string sName);
-	ModelInfo GetAddress(int nIdx);
 	static CModelManager* Instance(void);
+
+	// ゲッター
+	ModelInfo GetAddress(int nIdx);
+
 private:
-	CModelManager();
 	std::vector<ModelInfo> m_vModel;					// テクスチャのポインタ
 	D3DXVECTOR3 m_VtxMax;								// 頂点最大値
 	D3DXVECTOR3 m_VtxMin;								// 頂点最小値

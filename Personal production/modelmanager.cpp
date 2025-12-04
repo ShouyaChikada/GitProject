@@ -18,9 +18,6 @@ CModelManager::CModelManager()
 {
 	// ベクターのクリア
 	m_vModel.clear();
-
-	// 総数の初期化
-	//m_nNumAll = NULL;
 }
 
 //==============================================================
@@ -37,25 +34,6 @@ CModelManager::~CModelManager()
 HRESULT CModelManager::Load(std::string sName)
 {
 	return S_OK;
-}
-
-//==============================================================
-// モデルの法線再設定
-//==============================================================
-void CModelManager::ReCalcNormalize(const int Indx)
-{
-	// 法線のスムース化
-	const float Epsilon = 1e-6f;
-	std::vector<DWORD> adjacency(m_vModel[Indx].pMesh->GetNumFaces() * 3);
-	m_vModel[Indx].pMesh->GenerateAdjacency(Epsilon, adjacency.data());
-
-	HRESULT hr = D3DXComputeNormals(m_vModel[Indx].pMesh, adjacency.data());
-
-	if (FAILED(hr))
-	{
-		// 失敗したら
-		assert(0 && "モデルのスムース化に失敗しました");
-	}
 }
 
 //==============================================================
@@ -139,20 +117,17 @@ int CModelManager::Register(std::string sName)
 
 	for (int nCntMat = 0; nCntMat < (int)Info.dwNumMat; nCntMat++)
 	{
-
 		if (pMat[nCntMat].pTextureFilename != nullptr)
 		{//テクスチャファイルが存在する
 
 			// テクスチャポインタ取得
-			CTextureManager* pTexture = CTextureManager::Instance();
-			Info.pTexture[nCntMat] = pTexture->Register(pMat[nCntMat].pTextureFilename);
+			Info.pTexture[nCntMat] = CTextureManager::Instance()->Register(pMat[nCntMat].pTextureFilename);
 		}
 		else
 		{
 			Info.pTexture[nCntMat] = -1;
 		}
 	}
-
 
 	// 読み込みに失敗したら
 	if (FAILED(hr))
