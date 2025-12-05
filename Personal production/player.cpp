@@ -9,6 +9,8 @@
 #include "manager.h"
 #include "camera.h"
 #include "debugproc.h"
+#include "blockmanager.h"
+#include "bullet.h"
 
 //============================
 // コンストラクタ
@@ -19,7 +21,6 @@ CPlayer::CPlayer(int nPriority) : CObject(nPriority)
 	{
 		m_apModel[nCnt] = nullptr;
 	}
-	m_pShadowS = nullptr;
 	m_pMotion = nullptr;
 
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -30,9 +31,6 @@ CPlayer::CPlayer(int nPriority) : CObject(nPriority)
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	m_Diff = NULL;;
-	m_pMotion = NULL;
-
-	m_bJump = false;
 	m_bLeave = true;
 
 	//ワールドマトリックスの初期化
@@ -74,7 +72,6 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 HRESULT CPlayer::Init(void)
 {
 
-	m_pShadowS = CShadowS::Create("data\\MODEL\\bou3.x");
 	m_pMotion = CMotion::Create("data\\MOTION\\Human.txt", &m_apModel[0], CModel::QUAT_NONE);	//whichMotion.txt || motion2.txt
 	m_size = CModel::GetSize();
 
@@ -121,6 +118,8 @@ void CPlayer::Update(void)
 	//移動とモーションのセット
 	MoveInput();
 
+	CollisionBullet();
+
 	//角度の正規化
 	if (m_rot.y < -D3DX_PI)
 	{
@@ -146,6 +145,7 @@ void CPlayer::Update(void)
 		m_Diff = m_Diff - (D3DX_PI * 2);
 	}
 
+
 	//プレイヤーの向き
 	m_rot.y += m_Diff * 0.25f;
 
@@ -156,11 +156,19 @@ void CPlayer::Update(void)
 	//前回の位置を保存	位置更新の上で書く
 	m_posOld = m_pos;
 
+	CBlock** pBlock = CBlockManager::GetBlock();
+
 	// 位置を更新
 	m_pos += m_move;
 
-	// シャドウの設定
-	m_pShadowS->SetShadow(m_pos, m_rot);
+	for (int nCnt = 0; nCnt < MAX_BLOCK; nCnt++)
+	{
+		if (pBlock[nCnt] != nullptr)
+		{
+			//ブロックとの当たり判定
+			pBlock[nCnt]->Collision(&m_pos, &m_posOld, &m_move, &m_size);
+		}
+	}
 
 	// 位置の設定
 	SetPosition(m_pos);
@@ -171,29 +179,28 @@ void CPlayer::Update(void)
 //============================
 void CPlayer::Draw(void)
 {
-
-	//デバイス取得
-	LPDIRECT3DDEVICE9 pD3DDevice = CManager::GetRenderer()->GetDevice();
+	// デバイス取得
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリックス
 	D3DMATERIAL9 matDef; //現在のマテリアル保存用
 
-	//ワールドマトリックスの初期化
+	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	//向きを反映
+	// 向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	//位置を反映
+	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
-	//ワールドマトリックスの設定
-	pD3DDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
-	//現在のマテリアルを取得
-	pD3DDevice->GetMaterial(&matDef);
+	// 現在のマテリアルを取得
+	pDevice->GetMaterial(&matDef);
 
 	//モデルパーツを描画
 	for (int nCnt = 0; nCnt < MAX_PMODEL; nCnt++)
@@ -201,8 +208,8 @@ void CPlayer::Draw(void)
 		m_apModel[nCnt]->Draw();
 	}
 
-	//保存していたマテリアルを隠す
-	pD3DDevice->SetMaterial(&matDef);
+	// 保存していたマテリアルを隠す
+	pDevice->SetMaterial(&matDef);
 
 	// デバッグフォントの表示
 	CDebugProc::Print("プレイヤー座標 : { %.2f,%.2f,%.2f }\n", m_pos.x, m_pos.y, m_pos.z);
@@ -355,9 +362,50 @@ void CPlayer::MoveInput(void)
 	if (pInputKeyboard->GetPress(DIK_W) == false &&
 		pInputKeyboard->GetPress(DIK_S) == false &&
 		pInputKeyboard->GetPress(DIK_A) == false &&
-		pInputKeyboard->GetPress(DIK_D) == false &&
-		m_bJump == false)
+		pInputKeyboard->GetPress(DIK_D) == false)
 	{
 		m_pMotion->Set(CMotion::MOTIONTYPE_NEUTRAL);
+	}
+}
+
+void CPlayer::CollisionBullet(void)
+{
+	// キーボード
+	CInputKeyboard* pInputKeyboard = CManager::GetKeyboard();
+
+	// ステージモデルのみ調べる
+	CObject* pObj = CObject::GetTop(13);
+	while (pObj != NULL)
+	{
+		CObject* pObjNext = pObj->GetNext();
+		CObject::TYPE type = pObj->GetType();
+
+		if (type == TYPE_BULLET)
+		{
+			CBullet* pBullet = (CBullet*)pObj;
+			D3DXVECTOR3 BulletPos = pBullet->GetPosition();
+
+			//半径の算出変数
+			float PRadiusPos = 55.0f;
+			float BRadiusPos = 30.0f;
+
+			//範囲計算
+			float fDisX = m_pos.x - BulletPos.x;
+			float fDisY = m_pos.y - BulletPos.y;
+			float fDisZ = m_pos.z - BulletPos.z;
+
+			//二つの半径を求める
+			float fRadX = PRadiusPos + BRadiusPos;
+
+			// プレイヤーが雷のギミックの範囲に入っていたら
+			if ((fDisX * fDisX) + (fDisZ * fDisZ) <= (fRadX * fRadX))
+			{
+				if (pInputKeyboard->GetPress(DIK_SPACE) == true)
+				{
+					pBullet->CharngeMove();
+				}
+			}
+		}
+		pObj = pObjNext;
 	}
 }

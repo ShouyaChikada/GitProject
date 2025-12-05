@@ -20,8 +20,6 @@ CRock::CRock(int nPriolty) :CObjectX(nPriolty)
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Diff = NULL;
-
-	m_pShadowS = nullptr;
 }
 
 //=================================================
@@ -61,7 +59,6 @@ CRock* CRock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string FilePath, COb
 HRESULT CRock::Init(void)
 {
 	CObjectX::Init();
-	m_pShadowS = CShadowS::Create("data\\MODEL\\bou3.x");
 
 	return S_OK;
 }
@@ -110,9 +107,7 @@ void CRock::Update(void)
 	m_move.x += (0.0f - m_move.x) * 0.5f;
 	m_move.z += (0.0f - m_move.z) * 0.5f;
 
-	m_pShadowS->SetShadow(pos, rot);
-
-	m_pos = pos;
+	//m_pos = pos;
 }
 //=================================================
 // •`‰æˆ—

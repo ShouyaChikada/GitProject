@@ -52,8 +52,7 @@ HRESULT CGrand::Init(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 
-	CTextureManager* pTex = CManager::GetTexManager()->Instance();
-	m_nIdx = pTex->Register("data\\TEXTURE\\bkg.jpg");
+	m_nIdx = CTextureManager::Instance()->Register("data\\TEXTURE\\bkg.jpg");
 
 	//頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * GRAND_VERTEX_NUM,
@@ -78,7 +77,6 @@ HRESULT CGrand::Init(void)
 
 	//頂点バッファをロック
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
 
 	float fxz = 1500.0f;
 

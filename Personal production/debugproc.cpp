@@ -76,7 +76,9 @@ void CDebugProc::Print(const char* fmt, ...)
 // •`‰æ
 void CDebugProc::Draw(int aWidth,int aHeight)
 {
-#if 1
+#if 0
+
+
 	if (m_Enable == true)
 	{
 		RECT rect = { aWidth,aHeight, SCREEN_WIDTH,SCREEN_HEIGHT };

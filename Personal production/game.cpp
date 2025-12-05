@@ -11,19 +11,21 @@
 #include "rock.h"
 #include "timer.h"
 #include "enemy.h"
+#include "block.h"
 
 //=================================================
 // 静的メンバ変数
 //=================================================
 CPlayer* CGame::m_pPlayer = nullptr;
-CObject3D* CGame::m_pObject3D = nullptr;
-CObjectX* CGame::m_pObjectX = nullptr;
+CObject3D* CGame::m_pObj3D = nullptr;
+CObjectX* CGame::m_pObjX = nullptr;
 CMeshField* CGame::m_pMeshField = nullptr;
 CShadowS* CGame::m_pShadowS = nullptr;
 CGrand* CGame::m_pGrand = nullptr;
 CTimer* CGame::m_pTime = nullptr;
 CPauseManager* CGame::m_pPauseManager = nullptr;
 CModel* CGame::m_pModel1[MAX_HMODEL] = {};
+CBlockManager* CGame::m_pBlockManager = nullptr;
 bool CGame::m_bCheck = false;
 
 //=================================================
@@ -57,6 +59,12 @@ HRESULT CGame::Init(void)
 		return E_FAIL;
 	}
 
+	m_pBlockManager = new CBlockManager;
+	if (FAILED(m_pBlockManager->Init()))
+	{
+		return E_FAIL;
+	}
+
 	// 地球
 	CRock::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\earth000.x", CObjectX::ROT_OFF);
 
@@ -66,14 +74,15 @@ HRESULT CGame::Init(void)
 	// 月
 	CObjectX::Create(D3DXVECTOR3(0.0f, -1900.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\moon.x", CObjectX::ROT_ON);
 
-	// メッシュドーム
-	//CMeshField::Create(D3DXVECTOR3(200.0f, -1100.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 50.0f);
-
 	// タイム
 	CTimer::Create(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 
 	//	敵
-	CPlayer::Create(D3DXVECTOR3(0.0f, 10.0f, 100.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	CEnemy::Create(D3DXVECTOR3(0.0f, 10.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+	// プレイヤー
+	CPlayer::Create(D3DXVECTOR3(0.0f, 10.0f, -100.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
 	return S_OK;
 }
 
@@ -88,6 +97,14 @@ void CGame::Uninit(void)
 		m_pPauseManager->Uninit();
 		delete m_pPauseManager;
 		m_pPauseManager = nullptr;
+	}
+
+	if (m_pBlockManager != nullptr)
+	{
+		// ブロックマネージャーの終了処理
+		m_pBlockManager->Uninit();
+		delete m_pBlockManager;
+		m_pBlockManager = nullptr;
 	}
 
 }
@@ -106,6 +123,8 @@ void CGame::Update(void)
 	// ポーズの更新処理
 	m_pPauseManager->Update();
 	
+	// ブロックマネージャーの更新
+	m_pBlockManager->Update();
 
 	//// パッド
 	//CInputJoypad* pInputJoypad = nullptr;

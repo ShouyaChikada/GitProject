@@ -36,6 +36,7 @@ public:
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	D3DXVECTOR3 GetRot(void) { return m_rot; }
 	D3DXVECTOR3 GetVecAxis(void) { return m_VecAxis; }
+	D3DXVECTOR3 GetSize(void) { return m_Size; }
 	float GetValueRot(void) { return m_fValueRot; }
 
 	// セッター
@@ -67,6 +68,6 @@ private:
 	float m_Diff;								// 差分
 	int m_nIdx;									// モデルへのインデックス
 	float m_fAngle;								// 回転	
-	ROT m_Rotation;									// 回転用変数
+	ROT m_Rotation;								// 回転用変数
 };
 #endif

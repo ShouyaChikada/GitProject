@@ -209,12 +209,11 @@ void CModel::Draw(void)
 
 	// 位置のマトリックスの作成
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
-
 	// ワールドマトリックスに位置のマトリックスを加える
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-
+	
 	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+	//pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
 	//現在のマテリアルを取得
 	pDevice->GetMaterial(&matDef);

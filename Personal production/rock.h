@@ -36,7 +36,6 @@ private:
 	D3DXVECTOR3 m_pos;							// 位置
 	D3DXVECTOR3 m_posOld;						// 目的の位置
 	D3DXVECTOR3 m_move;							// 移動量
-	CShadowS* m_pShadowS;						// シャドウのポインタ
 	float m_Diff;								// 差分
 
 };

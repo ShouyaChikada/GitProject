@@ -48,7 +48,7 @@ public:
 	// ÉQÉbÉ^Å[
 	static int Getobject(void);
 	TYPE GetType(void);
-	CObject* GetNext(void);
+	CObject* GetNext(void) { return m_pNext; }
 	static CObject* Getobject(int nIdx);
 	static CObject* GetTop(int nPriority);
 

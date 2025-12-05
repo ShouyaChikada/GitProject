@@ -9,10 +9,11 @@
 #include "manager.h"
 #include "camera.h"
 #include "debugproc.h"
+#include "bullet.h"
 
-//============================
+//=================================================
 // コンストラクタ
-//============================
+//=================================================
 CEnemy::CEnemy(int nPriority) : CObject(nPriority)
 {
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -21,7 +22,9 @@ CEnemy::CEnemy(int nPriority) : CObject(nPriority)
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_Diff = 0.0f;
+	m_Diff = NULL;
+	m_nCreate = NULL;
+
 	m_bJump = false;
 	m_bLeave = true;
 
@@ -32,17 +35,17 @@ CEnemy::CEnemy(int nPriority) : CObject(nPriority)
 	m_pMotion = nullptr;
 }
 
-//============================
+//=================================================
 // デストラクタ
-//============================
+//=================================================
 CEnemy::~CEnemy()
 {
 
 }
 
-//============================
+//=================================================
 //  生成処理
-//============================
+//=================================================
 CEnemy* CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	CEnemy* pEnemy = nullptr;
@@ -61,9 +64,9 @@ CEnemy* CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	}
 }
 
-//============================
+//=================================================
 // 初期化処理
-//============================
+//=================================================
 HRESULT CEnemy::Init(void)
 {
 	m_pMotion = CMotion::Create("data\\MOTION\\motion_robot.txt", &m_apModel[0], CModel::QUAT_NONE);	//whichMotion.txt || motion2.txt
@@ -72,9 +75,9 @@ HRESULT CEnemy::Init(void)
 	return S_OK;
 }
 
-//============================
+//=================================================
 // 終了処理
-//============================
+//=================================================
 void CEnemy::Uninit(void)
 {
 	// モデルの破棄
@@ -101,16 +104,24 @@ void CEnemy::Uninit(void)
 	CObject::Release();
 }
 
-//============================
+//=================================================
 // 更新処理
-//============================
+//=================================================
 void CEnemy::Update(void)
 {
 	// モーションの更新
 	m_pMotion->Update(&m_apModel[0]);
 
-	// 移動のモーション
-	m_pMotion->Set(CMotion::MOTIONTYPE_NEUTRAL);
+	m_nCreate++;
+
+	if (m_nCreate >= 180)
+	{
+		CBullet::Create(m_pos, D3DXVECTOR3(0.0f,0.0f,-3.0f), 30.0f, "data\\TEXTURE\\bullet000.png");
+		m_nCreate = 0;
+	}
+
+	// 移動
+	//MoveInput();
 
 	//角度の正規化
 	if (m_rot.y < -D3DX_PI)
@@ -154,11 +165,33 @@ void CEnemy::Update(void)
 	SetPosition(m_pos);
 }
 
-//============================
+//=================================================
 // 描画処理
-//============================
+//=================================================
 void CEnemy::Draw(void)
 {
+	// デバイス取得
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
+
+	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリックス
+	D3DMATERIAL9 matDef; //現在のマテリアル保存用
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	// 現在のマテリアルを取得
+	pDevice->GetMaterial(&matDef);
 
 	//モデルパーツを描画
 	for (int nCnt = 0; nCnt < MAX_EMODEL; nCnt++)
@@ -166,8 +199,138 @@ void CEnemy::Draw(void)
 		m_apModel[nCnt]->Draw();
 	}
 
+	// 保存していたマテリアルを隠す
+	pDevice->SetMaterial(&matDef);
+
 	// デバッグフォントの表示
 	CDebugProc::Print("EnemyPos : { %.2f,%.2f,%.2f }\n", m_pos.x, m_pos.y, m_pos.z);
 
 }
 
+//=================================================
+// 移動用関数
+//=================================================
+void CEnemy::MoveInput(void)
+{
+	// キーボード
+	CInputKeyboard* pInputKeyboard = CManager::GetKeyboard();
+
+	//カメラの情報取得
+	CCamera* pCamera = CManager::GetCamera();
+	D3DXVECTOR3 rot = pCamera->GetRotasion();
+
+	pCamera->SetFollowing(m_pos, m_rotDest);
+
+
+	//左移動
+	if (pInputKeyboard->GetPress(DIK_A) == true)
+	{
+		// 移動のモーション
+		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
+
+		//前移動
+		if (pInputKeyboard->GetPress(DIK_W) == true)
+		{
+			m_rotDest.y = rot.y + D3DX_PI * 0.75f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+
+			//m_rot.z = 0.19625f;
+
+		}
+		//後ろ移動
+		else if (pInputKeyboard->GetPress(DIK_S) == true)
+		{
+
+			m_rotDest.y = rot.y + D3DX_PI * 0.25f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+
+		}
+		else
+		{
+
+			m_rotDest.y = rot.y + D3DX_PI * 0.5f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+
+		}
+	}
+	//右移動
+	if (pInputKeyboard->GetPress(DIK_D) == true)
+	{
+		// 移動のモーション
+		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
+		//前移動
+		if (pInputKeyboard->GetPress(DIK_W) == true)
+		{
+			m_rotDest.y = rot.y - D3DX_PI * 0.75f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+		//後ろ移動
+		else if (pInputKeyboard->GetPress(DIK_S) == true)
+		{
+			m_rotDest.y = rot.y - D3DX_PI * 0.25f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+		else
+		{
+
+			m_rotDest.y = rot.y - D3DX_PI * 0.5f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+	}
+	//前移動
+	if (pInputKeyboard->GetPress(DIK_W) == true)
+	{
+		// 移動のモーション
+		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
+
+		if (pInputKeyboard->GetPress(DIK_D) == true)
+		{
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+		//前移動
+		else if (pInputKeyboard->GetPress(DIK_A) == true)
+		{
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+		else
+		{
+			m_rotDest.y = rot.y + D3DX_PI;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+	}
+	//後ろ移動
+	if (pInputKeyboard->GetPress(DIK_S) == true)
+	{
+		// 移動のモーション
+		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
+
+		if (pInputKeyboard->GetPress(DIK_D) == true)
+		{
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+		//前移動
+		else if (pInputKeyboard->GetPress(DIK_A) == true)
+		{
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+		}
+		else
+		{
+			m_rotDest.y = rot.y;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+
+		}
+	}
+
+}

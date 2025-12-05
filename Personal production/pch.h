@@ -47,7 +47,7 @@
 #define FVF_VERTEX_3D (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	//座標・法線・カラー・テクスチャ
 #define D3DFVF_VERTEX (D3DFVF_XYZ | D3DFVF_DIFFUSE)										
 #define MAX_TEXTURE (128)															//テクスチャの最大数
-#define MAX_BLOCK (128)																//ブロックの最大数
+#define MAX_BLOCK (16)																//ブロックの最大数
 #define MAX_MODEL (32)																// 最大モデル数
 #define MAX_PMODEL (15)																//プレイヤーの最大モデル数
 #define MAX_HMODEL (15)																//人の最大モデル数

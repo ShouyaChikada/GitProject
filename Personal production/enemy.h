@@ -23,15 +23,7 @@
 class CEnemy :public CObject
 {
 public:
-	//typedef enum
-	//{
-	//	TYPE_MONE = 0,
-	//	TYPE_EXPROSION,
-	//	TYPE_THUMDER,
-	//	TYPE_WINDOW,
-	//	TYPE_WATER,
-	//	TYPE_MAX,
-	//}TYPE;
+
 	CEnemy(int nPriority = 5);
 	~CEnemy();
 	static CEnemy* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
@@ -42,7 +34,7 @@ public:
 
 	// セッター
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
-
+	void MoveInput(void);
 	// ゲッター
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	D3DXVECTOR3 GetRotDest(void) { return m_rotDest; }
@@ -63,6 +55,7 @@ private:
 	CMotion* m_pMotion;				// モーションポインタ
 	bool m_bJump;					// ジャンプ判定
 	bool m_bLeave;					// 生存確認
+	int m_nCreate;
 };
 
 #endif

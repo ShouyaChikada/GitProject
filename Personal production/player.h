@@ -10,7 +10,6 @@
 #include "main.h"
 #include "object.h"
 #include "objectx.h"
-#include "shadows.h"
 #include "model.h"
 #include "motion.h"
 
@@ -41,8 +40,10 @@ public:
 	void Draw(void);
 	static CPlayer* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
 
-	// セッター
 	void MoveInput(void);
+	void CollisionBullet(void);
+
+	// セッター
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
 
@@ -62,11 +63,10 @@ private:
 	D3DXVECTOR3 m_size;						// サイズ
 	D3DXMATRIX m_mtxWorld;					// ワールドマトリックス
 	float m_Diff;							// 差分
-	CShadowS* m_pShadowS;					// シャドウのポインタ
-	bool m_bJump;							// ジャンプ判定
 	bool m_bLeave;							// 生存フラグ
-	CModel* m_apModel[MAX_PMODEL];			//モデルのポインタ
-	CMotion* m_pMotion;
+
+	CModel* m_apModel[MAX_PMODEL];			// モデルのポインタ
+	CMotion* m_pMotion;						// モーションポインタ
 
 };
 
