@@ -68,10 +68,10 @@ public:
 
 	CMotion();
 	~CMotion();
-	HRESULT Init(const char* txt,CModel **ppModel);
+	HRESULT Init(const char* txt,CModel **ppModel, CModel::QUAT quat);
 	void Uninit(void);
 	void Update(CModel** ppModel);
-	static CMotion* Create(const char* txt, CModel** ppModel);
+	static CMotion* Create(const char* txt, CModel** ppModel, CModel::QUAT quat);
 
 	// ÉQÉbÉ^Å[
 	int GetType(void) { return m_nType; }

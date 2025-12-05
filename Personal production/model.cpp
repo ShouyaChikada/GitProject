@@ -30,6 +30,7 @@ CModel::CModel()
 	m_VtxMin = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_Size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_Quat = D3DXQUATERNION(0.0f, 0.0f, 0.0f, 0.0f);
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -48,7 +49,7 @@ CModel::~CModel()
 //=================================================
 // 生成
 //=================================================
-CModel* CModel::Create(std::string Path)
+CModel* CModel::Create(std::string Path, QUAT quat)
 {
 	CModel* pModel = nullptr;
 	pModel = new CModel;
@@ -56,6 +57,7 @@ CModel* CModel::Create(std::string Path)
 	if (pModel != nullptr)
 	{
 		pModel->SetIdx(Path);
+		pModel->SetQuat(quat);
 		pModel->Init();
 		return pModel;
 	}
@@ -80,6 +82,8 @@ HRESULT CModel::Init(void)
 	BYTE* pVtxBuff;		// 頂点バッファのポインタ
 	//----------------------------------------------
 	LPD3DXMESH pMesh = modelinfo.pMesh;
+
+	//m_Quat = D3DXQUATERNION(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// 頂点数の取得
 	nNumVtx = pMesh->GetNumVertices();
@@ -158,8 +162,7 @@ void CModel::Uninit(void)
 void CModel::Update(void)
 {
 	//前回の位置を保存	位置更新の上で書く
-	//m_posOld = m_pos;
-
+	m_posOld = m_pos;
 }
 
 //=================================================
@@ -181,17 +184,28 @@ void CModel::Draw(void)
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	// 回転軸のおける指定の回転角からクォータニオンを作成
-	D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
 
-	// クォータニオンから回転マトリックスの作成
-	D3DXMatrixRotationQuaternion(&mtxRot, &m_Quat);
+	if (m_QuatType == QUAT_ON)
+	{
+		// 回転軸のおける指定の回転角からクォータニオンを作成
+		D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
 
-	// 現在の回転量に次の回転量を加える
-	D3DXMatrixMultiply(&m_mtxRot, &m_mtxRot, &mtxRot);
+		// クォータニオンから回転マトリックスの作成
+		D3DXMatrixRotationQuaternion(&mtxRot, &m_Quat);
 
-	// 次の回転量をワールドマトリックスの加える
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxRot);
+		// 現在の回転量に次の回転量を加える
+		D3DXMatrixMultiply(&m_mtxRot, &m_mtxRot, &mtxRot);
+
+		// 次の回転量をワールドマトリックスの加える
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxRot);
+
+	}
+	else
+	{
+		//向きを反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+	}
 
 	// 位置のマトリックスの作成
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
@@ -207,7 +221,7 @@ void CModel::Draw(void)
 
 
 	//パーツの「親のマトリックス」を設定
-	if (m_pParent != NULL)
+	if (m_pParent != nullptr)
 	{//親のモデルがある場合
 		mtxParent = m_pParent->GetMtxWorld();//親モデルのインデックスを指定
 	}
@@ -232,7 +246,7 @@ void CModel::Draw(void)
 		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
 		// テクスチャインデックスがあるとき
-		if (modelinfo.pTexture[nCntMat] != -1)
+		if (modelinfo.pTexture[nCntMat] != - 1)
 		{				
 			//テクスチャ割り当て
 			pDevice->SetTexture(0, CTextureManager::Instance()->GetAddress(modelinfo.pTexture[nCntMat]));

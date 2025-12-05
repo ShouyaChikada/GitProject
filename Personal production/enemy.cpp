@@ -66,7 +66,7 @@ CEnemy* CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 //============================
 HRESULT CEnemy::Init(void)
 {
-	m_pMotion = CMotion::Create("data\\MOTION\\motion_robot.txt", &m_apModel[0]);	//whichMotion.txt || motion2.txt
+	m_pMotion = CMotion::Create("data\\MOTION\\motion_robot.txt", &m_apModel[0], CModel::QUAT_NONE);	//whichMotion.txt || motion2.txt
 	m_size = CModel::GetSize();
 
 	return S_OK;

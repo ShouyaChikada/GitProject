@@ -13,13 +13,20 @@ class CModel
 {
 public:
 
+	typedef enum
+	{
+		QUAT_NONE = 0,
+		QUAT_ON,
+		TYPE_MAX
+	}QUAT;
+
 	CModel();
 	~CModel();
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CModel* Create(std::string Path);
+	static CModel* Create(std::string Path, QUAT quat);
 
 	// ゲッター
 	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }
@@ -37,6 +44,7 @@ public:
 	void SetValueRot(float fValueRot) { m_fValueRot = fValueRot; }
 	void SetPosX(float posX) { m_pos.x = posX; };
 	void SetIdx(std::string Path);
+	void SetQuat(QUAT quat) { m_QuatType = quat; }
 
 private:
 
@@ -54,5 +62,6 @@ private:
 	CModel* m_pParent;				//親モデルのポインタ
 	float m_fValueRot;				// 回転角(回転量)
 	int m_nIdx;						// モデルへのインデックス
+	QUAT m_QuatType;
 };
 #endif

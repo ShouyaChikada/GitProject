@@ -57,8 +57,8 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	if (pPlayer != nullptr)
 	{
-		pPlayer->SetPosition(pos);
-		pPlayer->SetRotation(rot);
+		pPlayer->m_pos = pos;
+		pPlayer->m_rot = rot;
 		pPlayer->Init();
 		return pPlayer;
 	}
@@ -75,7 +75,7 @@ HRESULT CPlayer::Init(void)
 {
 
 	m_pShadowS = CShadowS::Create("data\\MODEL\\bou3.x");
-	m_pMotion = CMotion::Create("data\\MOTION\\Human.txt", &m_apModel[0]);	//whichMotion.txt || motion2.txt
+	m_pMotion = CMotion::Create("data\\MOTION\\Human.txt", &m_apModel[0], CModel::QUAT_NONE);	//whichMotion.txt || motion2.txt
 	m_size = CModel::GetSize();
 
 	return S_OK;
@@ -115,6 +115,7 @@ void CPlayer::Uninit(void)
 //============================
 void CPlayer::Update(void)
 {
+	// モーションの更新
 	m_pMotion->Update(&m_apModel[0]);
 
 	//移動とモーションのセット
@@ -148,7 +149,6 @@ void CPlayer::Update(void)
 	//プレイヤーの向き
 	m_rot.y += m_Diff * 0.25f;
 
-
 	//移動量を更新
 	m_move.x += (0.0f - m_move.x) * 0.5f;
 	m_move.z += (0.0f - m_move.z) * 0.5f;
@@ -172,17 +172,42 @@ void CPlayer::Update(void)
 void CPlayer::Draw(void)
 {
 
+	//デバイス取得
+	LPDIRECT3DDEVICE9 pD3DDevice = CManager::GetRenderer()->GetDevice();
+
+	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリックス
+	D3DMATERIAL9 matDef; //現在のマテリアル保存用
+
+	//ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	//ワールドマトリックスの設定
+	pD3DDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	//現在のマテリアルを取得
+	pD3DDevice->GetMaterial(&matDef);
+
 	//モデルパーツを描画
 	for (int nCnt = 0; nCnt < MAX_PMODEL; nCnt++)
 	{
 		m_apModel[nCnt]->Draw();
 	}
 
+	//保存していたマテリアルを隠す
+	pD3DDevice->SetMaterial(&matDef);
+
 	// デバッグフォントの表示
 	CDebugProc::Print("プレイヤー座標 : { %.2f,%.2f,%.2f }\n", m_pos.x, m_pos.y, m_pos.z);
 
 }
-
 
 //============================
 // 移動処理

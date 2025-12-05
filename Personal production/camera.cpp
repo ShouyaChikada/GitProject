@@ -26,6 +26,7 @@ CCamera::CCamera()
 	m_posVDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
+
 	m_fDistance = NULL;
 	m_bFlattery = false;
 	m_bTPS = NULL;

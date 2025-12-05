@@ -61,14 +61,14 @@ CMotion::~CMotion()
 //=================================================
 // モーションの生成
 //=================================================
-CMotion* CMotion::Create(const char* txt, CModel** ppModel)
+CMotion* CMotion::Create(const char* txt, CModel** ppModel, CModel::QUAT quat)
 {
 	CMotion* pMotion = nullptr;
 	pMotion = new CMotion;
 
 	if (pMotion != nullptr)
 	{
-		pMotion->Init(txt, ppModel);
+		pMotion->Init(txt, ppModel, quat);
 		return pMotion;
 	}
 	else
@@ -88,7 +88,7 @@ void CMotion::Uninit(void)
 //=================================================
 // 初期化
 //=================================================
-HRESULT CMotion::Init(const char* txt, CModel** ppModel)
+HRESULT CMotion::Init(const char* txt, CModel** ppModel, CModel::QUAT quat)
 {
 	FILE* pFile;
 
@@ -135,10 +135,10 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 						// 文字の読み込み
 						fscanf(pFile, "%s", &aStr[0]);
 
-						const char* MODELFILE = {};
+						std::string MODELFILE = {};
 						MODELFILE = aStr;
 
-						ppModel[nCnt] = CModel::Create(MODELFILE);
+						ppModel[nCnt] = CModel::Create(MODELFILE,quat);
 
 						nCnt++;
 					}
@@ -224,13 +224,13 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 
 							if (strcmp(aStr, "LOOP") == 0)
 							{
-								// 文字の読み込み
+								// (=)の除去
 								fscanf(pFile, "%s", &omit[0]);
 								fscanf(pFile, "%d", &m_aInfo[nMotion].m_bLoop);
 							}
 							else if (strcmp(aStr, "NUM_KEY") == 0)
 							{
-								// 文字の読み込み
+								// (=)の除去
 								fscanf(pFile, "%s", &omit[0]);
 								fscanf(pFile, "%d", &m_aInfo[nMotion].m_nNumKey);
 							}
@@ -250,6 +250,7 @@ HRESULT CMotion::Init(const char* txt, CModel** ppModel)
 
 										if (strcmp(aStr, "FRAME") == 0)
 										{
+											// (=)の除去
 											fscanf(pFile, "%s", &omit[0]);
 											fscanf(pFile, "%d", &m_aInfo[nMotion].m_aKeyInfo[nKey].m_nFrame);
 											break;
@@ -357,12 +358,12 @@ void CMotion::Update(CModel** ppModel)
 		Diff.m_fRotY = m_aInfo[MotionType].m_aKeyInfo[m_nNext].m_aKey[nCntModel].m_fRotY - m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fRotY;
 		Diff.m_fRotZ = m_aInfo[MotionType].m_aKeyInfo[m_nNext].m_aKey[nCntModel].m_fRotZ - m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fRotZ;
 
-		//求める値						   
+		//求める値(位置)
 		Value.m_fPosX = m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fPosX + Diff.m_fPosX * ((float)(m_nCounterMotion) / (float)(m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame));
 		Value.m_fPosY = m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fPosY + Diff.m_fPosY * ((float)(m_nCounterMotion) / (float)(m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame));
 		Value.m_fPosZ = m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fPosZ + Diff.m_fPosZ * ((float)(m_nCounterMotion) / (float)(m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame));
 
-		//求める値						   
+		//求める値(向き)
 		Value.m_fRotX = m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fRotX + Diff.m_fRotX * ((float)(m_nCounterMotion) / (float)(m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame));
 		Value.m_fRotY = m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fRotY + Diff.m_fRotY * ((float)(m_nCounterMotion) / (float)(m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame));
 		Value.m_fRotZ = m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_aKey[nCntModel].m_fRotZ + Diff.m_fRotZ * ((float)(m_nCounterMotion) / (float)(m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame));
@@ -376,18 +377,18 @@ void CMotion::Update(CModel** ppModel)
 	m_nCounterMotion++;
 
 	//カウンターモーションのリセット処理
-	if (m_nCounterMotion >= m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame)
+	if (m_aInfo[MotionType].m_aKeyInfo[m_nKey].m_nFrame <= m_nCounterMotion)
 	{
 		m_nCounterMotion = 0;
 		m_nKey++;
 		m_nNext++;
 
-		if (m_nKey >= m_aInfo[MotionType].m_nNumKey)
+		if (m_aInfo[MotionType].m_nNumKey <= m_nKey)
 		{
 			m_nKey = 0;
 		}
 
-		if (m_nNext >= m_aInfo[MotionType].m_nNumKey)
+		if (m_aInfo[MotionType].m_nNumKey <= m_nNext)
 		{
 			m_nNext = 0;	
 		}
