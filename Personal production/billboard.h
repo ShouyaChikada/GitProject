@@ -40,7 +40,6 @@ private:
 	D3DXVECTOR3 m_pos;					//位置
 	D3DXVECTOR3 m_rot;					//向き
 	D3DXCOLOR m_col;
-	D3DXVECTOR3 m_move;					//移動量
 	D3DXVECTOR3 m_dir;					//向き格納
 	D3DXMATRIX m_mtxWorld;				//ワールドマトリックス
 	std::string m_Path;

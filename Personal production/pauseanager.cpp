@@ -99,19 +99,22 @@ void CPauseManager::Update(void)
 	switch (m_SelectIdx - 1)
 	{
 	case MENU_CONTINUE:
-		m_pPause[1]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-		m_pPause[2]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-		m_pPause[3]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+		m_pPause[0]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.8f));
+		m_pPause[1]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		m_pPause[2]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+		m_pPause[3]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 		break;
 	case MENU_RETRY:
-		m_pPause[1]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-		m_pPause[2]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-		m_pPause[3]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+		m_pPause[0]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.8f));
+		m_pPause[1]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+		m_pPause[2]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		m_pPause[3]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 		break;
 	case MENU_QUIT:
-		m_pPause[1]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-		m_pPause[2]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-		m_pPause[3]->Setcol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		m_pPause[0]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.8f));
+		m_pPause[1]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+		m_pPause[2]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+		m_pPause[3]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		break;
 	}
 

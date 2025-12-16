@@ -4,15 +4,18 @@
 // Author: chikada shouya
 //
 //****************************************************************
-#include"timer.h"
-#include"number.h"
-#include"manager.h"
-//#include "game.h"
+#include "timer.h"
+#include "number.h"
+#include "manager.h"
+#include "fade.h"
+#include "result.h"
 
 // 静的メンバ変数宣言
 CNumber* CTimer::m_pNumber1[MAX_TIMER] = {};
 CNumber* CTimer::m_pNumber2[MAX_TIMER] = {};
 CNumber* CTimer::m_pNumber3 = {};
+int CTimer::m_nSecond = NULL;
+int CTimer::m_nMinute = NULL;
 int CTimer::m_nTimer = NULL;
 
 //****************************************************************
@@ -61,9 +64,8 @@ CTimer* CTimer::Create(D3DXVECTOR3 pos)
 HRESULT CTimer::Init(void)
 {
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	m_nMin = 0;
-	m_nTimer = 0;
-	m_nHour = 0;
+	m_nMin = 2;
+	m_nTime = 30;
 
 	float fAdd = 50.0f;
 
@@ -90,6 +92,10 @@ HRESULT CTimer::Init(void)
 	{
 		m_pNumber3->Init(150.0f, NULL, NULL, "data\\TEXTURE\\coron.png", CNumber::NUM_SCORE);
 	}
+
+	// 分秒設定
+	SubMin(0);
+	SubNs(0);
 
 	return S_OK;
 }
@@ -134,13 +140,8 @@ void CTimer::Uninit(void)
 //****************************************************************
 void CTimer::Update(void)
 {
-	//bool bTime1 = CGame::GetGoal();
-
 	// 秒の加算
 	m_nNs++;
-
-	// 時の計算
-	m_nHour++;
 
 	// 1秒経過
 	if (m_nNs > 60)
@@ -151,28 +152,23 @@ void CTimer::Update(void)
 	}
 
 	// 1分経過
-	if (m_nTime >= 60)
+	if (m_nTime < 0)
 	{
 		SubNs(-60);
 		SubMin(1);
-
-		m_nTime = 0;
 	}
 
-	if (m_nHour >= MAX_HOUR)
+	m_nSecond = m_nTime;
+	m_nMinute = m_nMin;
+
+	// フェード
+	CFade* pFade = CManager::GetFade();
+
+	if (m_nTime <= 0 && m_nMin <= 0)
 	{
-		SubNs(-60);
-		SubMin(-60);
-
-		m_nHour = 0;
+		//モード設定(ゲーム画面に移行)
+		pFade->SetFade(new CResult());
 	}
-
-	//// ゴールしていなかったら
-	//if (bTime1 != true)
-	//{
-	//	// 総タイムを加算
-	//	m_nTimer++;
-	//}
 }
 
 //****************************************************************
@@ -213,7 +209,7 @@ void CTimer::SubNs(int nValue)
 	int nData = 100;
 	int nData1 = 10;
 
-	m_nTime += nValue;
+	m_nTime -= nValue;
 
 	for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
 	{
@@ -235,7 +231,7 @@ void CTimer::SubMin(int nValue)
 	int nData = 100;
 	int nData1 = 10;
 
-	m_nMin += nValue;
+	m_nMin -= nValue;
 
 	for (int nCnt = 0; nCnt < MAX_TIMER; nCnt++)
 	{

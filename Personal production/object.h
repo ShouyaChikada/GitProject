@@ -53,7 +53,6 @@ public:
 	static CObject* GetTop(int nPriority);
 
 	// セッター
-	D3DXVECTOR3 SetSize(D3DXVECTOR3 VtxMax, D3DXVECTOR3 VtxMin, int nNumVtx, DWORD sizeFVF, BYTE* pVtxBuff);
 	void SetType(TYPE type);
 
 protected:

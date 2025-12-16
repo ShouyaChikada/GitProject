@@ -112,16 +112,8 @@ void CEnemy::Update(void)
 	// モーションの更新
 	m_pMotion->Update(&m_apModel[0]);
 
-	m_nCreate++;
-
-	if (m_nCreate >= 180)
-	{
-		CBullet::Create(m_pos, D3DXVECTOR3(0.0f,0.0f,-3.0f), 30.0f, "data\\TEXTURE\\bullet000.png");
-		m_nCreate = 0;
-	}
-
 	// 移動
-	//MoveInput();
+	MoveInput();
 
 	//角度の正規化
 	if (m_rot.y < -D3DX_PI)
@@ -160,6 +152,14 @@ void CEnemy::Update(void)
 
 	// 位置を移動
 	m_pos += m_move;
+
+	m_nCreate++;
+
+	if (m_nCreate >= 180)
+	{
+		//CBullet::Create(m_pos, D3DXVECTOR3(0.0f, 0.0f, -3.0f), 30.0f, "data\\TEXTURE\\bullet000.png");
+		m_nCreate = 0;
+	}
 
 	// 位置の設定
 	SetPosition(m_pos);
@@ -223,13 +223,13 @@ void CEnemy::MoveInput(void)
 
 
 	//左移動
-	if (pInputKeyboard->GetPress(DIK_A) == true)
+	if (pInputKeyboard->GetPress(DIK_LEFT) == true)
 	{
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 
 		//前移動
-		if (pInputKeyboard->GetPress(DIK_W) == true)
+		if (pInputKeyboard->GetPress(DIK_UP) == true)
 		{
 			m_rotDest.y = rot.y + D3DX_PI * 0.75f;
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
@@ -239,7 +239,7 @@ void CEnemy::MoveInput(void)
 
 		}
 		//後ろ移動
-		else if (pInputKeyboard->GetPress(DIK_S) == true)
+		else if (pInputKeyboard->GetPress(DIK_DOWN) == true)
 		{
 
 			m_rotDest.y = rot.y + D3DX_PI * 0.25f;
@@ -257,19 +257,19 @@ void CEnemy::MoveInput(void)
 		}
 	}
 	//右移動
-	if (pInputKeyboard->GetPress(DIK_D) == true)
+	if (pInputKeyboard->GetPress(DIK_RIGHT) == true)
 	{
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 		//前移動
-		if (pInputKeyboard->GetPress(DIK_W) == true)
+		if (pInputKeyboard->GetPress(DIK_UP) == true)
 		{
 			m_rotDest.y = rot.y - D3DX_PI * 0.75f;
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 		}
 		//後ろ移動
-		else if (pInputKeyboard->GetPress(DIK_S) == true)
+		else if (pInputKeyboard->GetPress(DIK_DOWN) == true)
 		{
 			m_rotDest.y = rot.y - D3DX_PI * 0.25f;
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
@@ -284,18 +284,18 @@ void CEnemy::MoveInput(void)
 		}
 	}
 	//前移動
-	if (pInputKeyboard->GetPress(DIK_W) == true)
+	if (pInputKeyboard->GetPress(DIK_UP) == true)
 	{
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 
-		if (pInputKeyboard->GetPress(DIK_D) == true)
+		if (pInputKeyboard->GetPress(DIK_RIGHT) == true)
 		{
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 		}
 		//前移動
-		else if (pInputKeyboard->GetPress(DIK_A) == true)
+		else if (pInputKeyboard->GetPress(DIK_LEFT) == true)
 		{
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
@@ -308,18 +308,18 @@ void CEnemy::MoveInput(void)
 		}
 	}
 	//後ろ移動
-	if (pInputKeyboard->GetPress(DIK_S) == true)
+	if (pInputKeyboard->GetPress(DIK_DOWN) == true)
 	{
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 
-		if (pInputKeyboard->GetPress(DIK_D) == true)
+		if (pInputKeyboard->GetPress(DIK_RIGHT) == true)
 		{
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 		}
 		//前移動
-		else if (pInputKeyboard->GetPress(DIK_A) == true)
+		else if (pInputKeyboard->GetPress(DIK_LEFT) == true)
 		{
 			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
 			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;

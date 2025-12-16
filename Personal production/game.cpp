@@ -8,10 +8,10 @@
 #include "game.h"
 #include "manager.h"
 #include "result.h"
-#include "rock.h"
 #include "timer.h"
 #include "enemy.h"
 #include "block.h"
+#include "effect.h"
 
 //=================================================
 // 静的メンバ変数
@@ -23,9 +23,11 @@ CMeshField* CGame::m_pMeshField = nullptr;
 CShadowS* CGame::m_pShadowS = nullptr;
 CGrand* CGame::m_pGrand = nullptr;
 CTimer* CGame::m_pTime = nullptr;
-CPauseManager* CGame::m_pPauseManager = nullptr;
 CModel* CGame::m_pModel1[MAX_HMODEL] = {};
+CPauseManager* CGame::m_pPauseManager = nullptr;
 CBlockManager* CGame::m_pBlockManager = nullptr;
+CBulletManager* CGame::m_pBulletManager = nullptr;
+CRockManager* CGame::m_pRockManager = nullptr;
 bool CGame::m_bCheck = false;
 
 //=================================================
@@ -53,32 +55,43 @@ HRESULT CGame::Init(void)
 
 	m_bCheck = false;
 
+	// ポーズマネージャーの初期化
 	m_pPauseManager = new CPauseManager;
 	if (FAILED(m_pPauseManager->Init()))
 	{
 		return E_FAIL;
 	}
 
+	// ブロックマネージャーの初期化
 	m_pBlockManager = new CBlockManager;
 	if (FAILED(m_pBlockManager->Init()))
 	{
 		return E_FAIL;
 	}
 
-	// 地球
-	CRock::Create(D3DXVECTOR3(0.0f, 10.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\earth000.x", CObjectX::ROT_OFF);
+	// バレットマネージャーの初期化
+	m_pBulletManager = new CBulletManager;
+	if (FAILED(m_pBulletManager->Init()))
+	{
+		return E_FAIL;
+	}
+
+	// ロックマネージャーの初期化
+	m_pRockManager = new CRockManager;
+	if (FAILED(m_pRockManager->Init()))
+	{
+		return E_FAIL;
+	}
+
 
 	// 床
 	CGrand::Create(D3DXVECTOR3(0.0f, -500.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	// 月
-	CObjectX::Create(D3DXVECTOR3(0.0f, -1900.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\moon.x", CObjectX::ROT_ON);
+	CObjectX::Create(D3DXVECTOR3(0.0f, -1900.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), "data\\MODEL\\moon.x", CObjectX::ROT_ON1);
 
 	// タイム
 	CTimer::Create(D3DXVECTOR3(100.0f, 100.0f, 0.0f));
-
-	//	敵
-	CEnemy::Create(D3DXVECTOR3(0.0f, 10.0f, 200.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	// プレイヤー
 	CPlayer::Create(D3DXVECTOR3(0.0f, 10.0f, -100.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
@@ -107,6 +120,22 @@ void CGame::Uninit(void)
 		m_pBlockManager = nullptr;
 	}
 
+	if (m_pBulletManager != nullptr)
+	{
+		// バレットマネージャーの終了処理
+		m_pBulletManager->Uninit();
+		delete m_pBulletManager;
+		m_pBulletManager = nullptr;
+	}
+
+	if (m_pRockManager != nullptr)
+	{
+		// ロックマネージャーの終了処理
+		m_pRockManager->Uninit();
+		delete m_pRockManager;
+		m_pRockManager = nullptr;
+	}
+
 }
 
 //=================================================
@@ -126,6 +155,12 @@ void CGame::Update(void)
 	// ブロックマネージャーの更新
 	m_pBlockManager->Update();
 
+	// バレットマネージャーの更新
+	m_pBulletManager->Update();
+
+	// ロックマネージャーの更新
+	m_pRockManager->Update();
+
 	//// パッド
 	//CInputJoypad* pInputJoypad = nullptr;
 	//pInputJoypad = CManager::GetJoypad();
@@ -133,11 +168,9 @@ void CGame::Update(void)
 	// フェード
 	CFade* pFade = CManager::GetFade();
 
-
 	if (m_pPauseManager->GetPause() == false)
 	{
-
-		if (pInputKeyboard->GetTrigger(DIK_RETURN) == true)
+		if (pInputKeyboard->GetTrigger(DIK_F1) == true)
 		{//決定キー(ENTERキー)が押された
 			//モード設定(ゲーム画面に移行)
 			pFade->SetFade(new CResult());

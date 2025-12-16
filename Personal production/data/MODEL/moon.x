@@ -563,7 +563,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    1.000000;0.937000;0.753000;;
    TextureFilename {
-    "G:\\マイドライブ\\kabe\\moon.jpg";
+    "data\\TEXTURE\\moon.jpg";
    }
   }
  }

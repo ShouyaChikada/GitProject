@@ -54,6 +54,7 @@ public:
 
 	bool GetPress(int nKey);
 	bool GetTrigger(int nKey);
+	bool GetRelease(int nKey);
 
 private:
 	BYTE m_aKeyState[NUM_KEY_MAX];
@@ -97,6 +98,7 @@ public:
 	void Update(void);
 	bool GetPress(KEY key);
 	bool GetTrigger(KEY key);
+	bool GetRelease(KEY key);
 
 private:
 	XINPUT_STATE m_joykeyState; //ジョイパッドのプレス情報

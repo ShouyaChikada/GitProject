@@ -16,7 +16,6 @@ CBillboard::CBillboard(int nPriority) : CObject(nPriority)
 	m_SetPosition = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_pos = D3DXVECTOR3(0.0f,0.0f,0.0f);		//ˆÊ’u
 	m_rot = D3DXVECTOR3(0.0f,0.0f,0.0f);		//Œü‚«
-	m_move = D3DXVECTOR3(0.0f,0.0f,0.0f);		//ˆÚ“®—Ê
 	m_dir = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		//Œü‚«Ši”[
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_bTest = false;
@@ -43,7 +42,6 @@ CBillboard* CBillboard::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, std::string Fi
 	if (pBillboard != nullptr)
 	{
 		pBillboard->m_pos = pos;
-		pBillboard->m_move = move;
 		pBillboard->m_Path = FilePath;
 		pBillboard->Init();
 		return pBillboard;

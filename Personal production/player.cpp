@@ -11,10 +11,21 @@
 #include "debugproc.h"
 #include "blockmanager.h"
 #include "bullet.h"
+#include "rockmanager.h"
 
-//============================
+//=================================================
+// 静的メンバ変数
+//=================================================
+D3DXVECTOR3 CPlayer::m_GetPos = {};
+D3DXVECTOR3 CPlayer::m_GetRot = {};
+D3DXVECTOR3 CPlayer::m_GetRotDest = {};
+bool CPlayer::m_bTamesi0 = false;
+bool CPlayer::m_bTamesi1 = false;
+bool CPlayer::m_bTamesi2 = false;
+
+//=================================================
 // コンストラクタ
-//============================
+//=================================================
 CPlayer::CPlayer(int nPriority) : CObject(nPriority)
 {
 	for (int nCnt = 0; nCnt < MAX_PMODEL; nCnt++)
@@ -27,27 +38,32 @@ CPlayer::CPlayer(int nPriority) : CObject(nPriority)
 	m_posOld = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_GetRotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_size = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	m_Diff = NULL;;
+	m_fAddMove = NULL;
+	m_fAddLR = NULL;
+	m_fAddUD = NULL;
+
 	m_bLeave = true;
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 }
 
-//============================
+//=================================================
 // デストラクタ
-//============================
+//=================================================
 CPlayer::~CPlayer()
 {
 
 }
 
-//============================
+//=================================================
 //  生成処理
-//============================
+//=================================================
 CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 {
 	CPlayer* pPlayer = nullptr;
@@ -66,21 +82,22 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	}
 }
 
-//============================
+//=================================================
 // 初期化処理
-//============================
+//=================================================
 HRESULT CPlayer::Init(void)
 {
 
+	m_GetPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_pMotion = CMotion::Create("data\\MOTION\\Human.txt", &m_apModel[0], CModel::QUAT_NONE);	//whichMotion.txt || motion2.txt
 	m_size = CModel::GetSize();
 
 	return S_OK;
 }
 
-//============================
+//=================================================
 // 終了処理
-//============================
+//=================================================
 void CPlayer::Uninit(void)
 {
 	m_bLeave = false;
@@ -107,9 +124,9 @@ void CPlayer::Uninit(void)
 	CObject::Release();
 }
 
-//============================
+//=================================================
 // 更新処理
-//============================
+//=================================================
 void CPlayer::Update(void)
 {
 	// モーションの更新
@@ -117,7 +134,7 @@ void CPlayer::Update(void)
 
 	//移動とモーションのセット
 	MoveInput();
-
+	
 	CollisionBullet();
 
 	//角度の正規化
@@ -145,22 +162,54 @@ void CPlayer::Update(void)
 		m_Diff = m_Diff - (D3DX_PI * 2);
 	}
 
+	// 左右
+	if (m_rotDest.y >= -1.0f && m_rotDest.y <= 1.0f)
+	{
+		m_fAddLR = 50.0f;
+		m_fAddUD = 0.0f;
+	}
+	else if (m_rotDest.y >= 3.13f && m_rotDest.y <= 3.15f)
+	{
+		m_fAddLR = -50.0f;
+		m_fAddUD = 0.0f;
+	}
+	else if ((m_rotDest.y >= 1.56f && m_rotDest.y <= 1.58f))
+	{
+		m_fAddLR = 0.0f;
+		m_fAddUD = -50.0f;
+	}
+	else if ((m_rotDest.y <= -1.56f && m_rotDest.y >= -1.58f))
+	{
+		m_fAddLR = 0.0f;
+		m_fAddUD = 50.0f;
+	}
+
+	// 判定(試作品)
+	VectorJudgeL();
+	VectorJudgeR();
+	VectorJudge();
 
 	//プレイヤーの向き
 	m_rot.y += m_Diff * 0.25f;
 
+	m_GetRot = m_rot;
+
 	//移動量を更新
-	m_move.x += (0.0f - m_move.x) * 0.5f;
-	m_move.z += (0.0f - m_move.z) * 0.5f;
+	m_move.x += (0.0f - m_move.x) * 0.09f;
+	m_move.z += (0.0f - m_move.z) * 0.09f;
 
 	//前回の位置を保存	位置更新の上で書く
 	m_posOld = m_pos;
 
-	CBlock** pBlock = CBlockManager::GetBlock();
-
 	// 位置を更新
 	m_pos += m_move;
 
+	// ブロックと岩のポインタ
+	CBlock** pBlock = CBlockManager::GetBlock();
+	CMeteoRock** pRock = CRockManager::GetRock();
+	CMeteoPillar** pPillar = CRockManager::GetPillar();
+
+	// 当たり判定
 	for (int nCnt = 0; nCnt < MAX_BLOCK; nCnt++)
 	{
 		if (pBlock[nCnt] != nullptr)
@@ -170,13 +219,32 @@ void CPlayer::Update(void)
 		}
 	}
 
+	for (int nCnt = 0; nCnt < MAX_ROCK; nCnt++)
+	{
+		if (pRock[nCnt] != nullptr)
+		{
+			//ロックとの当たり判定
+			pRock[nCnt]->Collision(&m_pos, &m_posOld, &m_move, &m_size);
+		}
+		if (pPillar[nCnt] != nullptr)
+		{
+			//ロックとの当たり判定
+ 			pPillar[nCnt]->Collision(&m_pos, &m_posOld, &m_move, &m_size);
+
+		}
+	}
+
+	// 取得関数に保存
+	m_GetPos = m_pos;
+	m_GetRotDest = m_rotDest;
+
 	// 位置の設定
 	SetPosition(m_pos);
 }
 
-//============================
+//=================================================
 // 描画処理
-//============================
+//=================================================
 void CPlayer::Draw(void)
 {
 	// デバイス取得
@@ -214,11 +282,31 @@ void CPlayer::Draw(void)
 	// デバッグフォントの表示
 	CDebugProc::Print("プレイヤー座標 : { %.2f,%.2f,%.2f }\n", m_pos.x, m_pos.y, m_pos.z);
 
+	if (m_bTamesi0 == true || m_bTamesi1 == true)
+	{
+		CDebugProc::Print("判定に入っている\n");
+	}
+	else if (m_bTamesi0 == false || m_bTamesi1 == false)
+	{
+		CDebugProc::Print("判定に入っていない\n");
+	}
+
+	if (m_bTamesi2 == true)
+	{
+		CDebugProc::Print("全体判定に入っている\n");
+	}
+	else
+	{
+		CDebugProc::Print("全体判定に入っていない\n");
+	}
+
+	CDebugProc::Print("RotDest :{ %.2f,%.2f,%.2f }\n", m_rotDest.x, m_rotDest.y, m_rotDest.z);
+
 }
 
-//============================
+//=================================================
 // 移動処理
-//============================
+//=================================================
 void CPlayer::MoveInput(void)
 {
 	// キーボード
@@ -234,6 +322,11 @@ void CPlayer::MoveInput(void)
 	//左移動
 	if (pInputKeyboard->GetPress(DIK_A) == true)
 	{
+		if (m_fAddMove <= 10.0f)
+		{
+			m_fAddMove += 0.1f;
+		}
+
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 
@@ -241,8 +334,8 @@ void CPlayer::MoveInput(void)
 		if (pInputKeyboard->GetPress(DIK_W) == true)
 		{
 			m_rotDest.y = rot.y + D3DX_PI * 0.75f;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 
 			//m_rot.z = 0.19625f;
 
@@ -252,110 +345,112 @@ void CPlayer::MoveInput(void)
 		{
 
 			m_rotDest.y = rot.y + D3DX_PI * 0.25f;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 
 		}
 		else
 		{
-
 			m_rotDest.y = rot.y + D3DX_PI * 0.5f;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 
 		}
 	}
 	//右移動
 	if (pInputKeyboard->GetPress(DIK_D) == true)
 	{
+		if (m_fAddMove <= 10.0f)
+		{
+			m_fAddMove += 0.1f;
+		}
+
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 		//前移動
 		if (pInputKeyboard->GetPress(DIK_W) == true)
 		{
 			m_rotDest.y = rot.y - D3DX_PI * 0.75f;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 		//後ろ移動
 		else if (pInputKeyboard->GetPress(DIK_S) == true)
 		{
 			m_rotDest.y = rot.y - D3DX_PI * 0.25f;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 		else
 		{
-
 			m_rotDest.y = rot.y - D3DX_PI * 0.5f;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 	}
 	//前移動
 	if (pInputKeyboard->GetPress(DIK_W) == true)
 	{
+
+		if (m_fAddMove <= 10.0f)
+		{
+			m_fAddMove += 0.1f;
+		}
+
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 
 		if (pInputKeyboard->GetPress(DIK_D) == true)
 		{
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_rotDest.y = rot.y - D3DX_PI * 0.75f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 		//前移動
 		else if (pInputKeyboard->GetPress(DIK_A) == true)
 		{
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_rotDest.y = rot.y + D3DX_PI * 0.75f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 		else
 		{
 			m_rotDest.y = rot.y + D3DX_PI;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 	}
 	//後ろ移動
 	if (pInputKeyboard->GetPress(DIK_S) == true)
 	{
+		if (m_fAddMove <= 10.0f)
+		{
+			m_fAddMove += 0.1f;
+		}
+
 		// 移動のモーション
 		m_pMotion->Set(CMotion::MOTIONTYPE_MOVE);
 
 		if (pInputKeyboard->GetPress(DIK_D) == true)
 		{
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_rotDest.y = rot.y - D3DX_PI * 0.25f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 		//前移動
 		else if (pInputKeyboard->GetPress(DIK_A) == true)
 		{
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_rotDest.y = rot.y + D3DX_PI * 0.25f;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 		}
 		else
 		{
 			m_rotDest.y = rot.y;
-			m_move.x = sinf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
-			m_move.z = cosf(m_rotDest.y + D3DX_PI) * MAX_PSPEED;
+			m_move.x = sinf(m_rotDest.y + D3DX_PI) * m_fAddMove;
+			m_move.z = cosf(m_rotDest.y + D3DX_PI) * m_fAddMove;
 
 		}
-	}
-
-	// 上昇
-	if (pInputKeyboard->GetPress(DIK_UP) == true)
-	{
-		m_move.y = 2.5f;
-	}
-
-	// 降下
-	else if (pInputKeyboard->GetPress(DIK_DOWN) == true)
-	{
-		m_move.y = -2.5f;
-	}
-	else
-	{
-		m_move.y = 0.0f;
 	}
 
 	// 動いてないときはニュートラルに
@@ -365,9 +460,14 @@ void CPlayer::MoveInput(void)
 		pInputKeyboard->GetPress(DIK_D) == false)
 	{
 		m_pMotion->Set(CMotion::MOTIONTYPE_NEUTRAL);
+		
+		m_fAddMove = 0.0f;
 	}
 }
 
+//=================================================
+// 弾との当たり判定
+//=================================================
 void CPlayer::CollisionBullet(void)
 {
 	// キーボード
@@ -402,10 +502,141 @@ void CPlayer::CollisionBullet(void)
 			{
 				if (pInputKeyboard->GetPress(DIK_SPACE) == true)
 				{
-					pBullet->CharngeMove();
+					//pBullet->CharngeMove();
 				}
 			}
 		}
 		pObj = pObjNext;
+	}
+}
+
+//=================================================
+// 右＆後ろの判定
+//=================================================
+
+void CPlayer::VectorJudgeR(void)
+{
+	//半径の算出変数
+	float PRadius = 15.0f;
+	float RRadius = 15.0f;
+
+	//弾とプレイヤーの距離の差
+	D3DXVECTOR3 diff = {};
+	D3DXVECTOR3 RockPos[MAX_ROCK] = {};
+
+	// ロックのポインタを取得
+	CMeteoRock** pRock = CRockManager::GetRock();
+
+	if (m_bTamesi1 == false)
+	{
+		for (int nCnt = 0; nCnt < MAX_ROCK; nCnt++)
+		{
+			if (pRock[nCnt] != nullptr)
+			{
+				//岩の位置の取得
+				RockPos[nCnt] = pRock[nCnt]->GetPosition();
+
+				//範囲計算
+				float fDisX = (RockPos[nCnt].x - m_fAddLR) - m_pos.x;
+				float fDisY = RockPos[nCnt].y - m_pos.y;
+				float fDisZ = (RockPos[nCnt].z - m_fAddUD) - m_pos.z;
+
+				//二つの半径を求める
+				float fRadX = PRadius + RRadius;
+
+				if ((fDisX * fDisX) + (fDisY * fDisY) + (fDisZ * fDisZ) <= (fRadX * fRadX))
+				{
+					m_bTamesi0 = true;
+				}
+			}
+
+		}
+	}
+}
+
+//=================================================
+// 左＆前の判定
+//=================================================
+void CPlayer::VectorJudgeL(void)
+{
+	//半径の算出変数
+	float PRadius = 15.0f;
+	float RRadius = 15.0f;
+
+	//弾とプレイヤーの距離の差
+	D3DXVECTOR3 diff = {};
+	D3DXVECTOR3 RockPos[MAX_ROCK] = {};
+
+	// ロックのポインタを取得
+	CMeteoRock** pRock = CRockManager::GetRock();
+
+	if (m_bTamesi0 == false)
+	{
+		for (int nCnt = 0; nCnt < MAX_ROCK; nCnt++)
+		{
+			if (pRock[nCnt] != nullptr)
+			{
+				//岩の位置の取得
+				RockPos[nCnt] = pRock[nCnt]->GetPosition();
+
+				//範囲計算
+				float fDisX = (RockPos[nCnt].x + m_fAddLR) - m_pos.x;
+				float fDisY = RockPos[nCnt].y - m_pos.y;
+				float fDisZ = (RockPos[nCnt].z + m_fAddUD) - m_pos.z;
+
+				//二つの半径を求める
+				float fRadX = PRadius + RRadius;
+
+				if ((fDisX * fDisX) + (fDisY * fDisY) + (fDisZ * fDisZ) <= (fRadX * fRadX))
+				{
+					m_bTamesi1 = true;
+				}
+			}
+
+		}
+	}
+}
+
+void CPlayer::VectorJudge(void)
+{
+	//半径の算出変数
+	float PRadius = 200.0f;
+	float RRadius = 15.0f;
+
+	//弾とプレイヤーの距離の差
+	D3DXVECTOR3 diff = {};
+	D3DXVECTOR3 RockPos[MAX_ROCK] = {};
+
+	// ロックのポインタを取得
+	CMeteoRock** pRock = CRockManager::GetRock();
+
+	if (m_bTamesi0 == false)
+	{
+		for (int nCnt = 0; nCnt < MAX_ROCK; nCnt++)
+		{
+			if (pRock[nCnt] != nullptr)
+			{
+				//岩の位置の取得
+				RockPos[nCnt] = pRock[nCnt]->GetPosition();
+
+				//範囲計算
+				float fDisX = RockPos[nCnt].x - m_pos.x;
+				float fDisY = RockPos[nCnt].y - m_pos.y;
+				float fDisZ = RockPos[nCnt].z - m_pos.z;
+
+				//二つの半径を求める
+				float fRadX = PRadius + RRadius;
+
+				if ((fDisX * fDisX) + (fDisY * fDisY) + (fDisZ * fDisZ) <= (fRadX * fRadX))
+				{
+					m_bTamesi2 = true;
+				}
+				else
+				{
+					m_bTamesi2 = false;
+				}
+			}
+
+		}
 	}
 }

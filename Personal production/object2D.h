@@ -41,38 +41,36 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-
-	void SetPosition(D3DXVECTOR3 pos);
-	void SetTex(float aUV, float zUV);
-	void SetAnim(D3DXVECTOR2 UV,float fSizeX,float fSizeY);
-	void SetAnim(float aTex, float fAdd);
-	void SetSize(float fWidth, float fHeight);
-	void SetEffect(D3DXVECTOR3 pos, D3DXCOLOR col, float fRadius);
-	void SetType(int nType) { m_nType = nType; }
-	void BindTexture(LPDIRECT3DTEXTURE9 pTexture);
-
-	static CObject2D* Create(D3DXVECTOR3 pos,D3DXVECTOR3 rot,float fWidth,float fHeight,D3DXCOLOR col);
-	void Set2Dpolygon(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, D3DXCOLOR col);
-	D3DXVECTOR3 GetPosition(void);
+	static CObject2D* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, D3DXCOLOR col);
 
 	void UpdateCenter(void);
 	void UpdateLeft(void);
-	//void UpdateCenter(void);
 
-	void SetCol(D3DXCOLOR col) { m_col = col; }
-	void Setcol(D3DXCOLOR col);
+	// セッター
+	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
+	void SetSize(float fWidth, float fHeight) { m_Width = fWidth; m_Height = fHeight; }
+	void SetType(int nType) { m_nType = nType; }
+	void SetCol(D3DXCOLOR col);
+	void SetAnim(D3DXVECTOR2 UV,float fSizeX,float fSizeY);
+	void SetAnim(float aTex, float fAdd);
+	void SetEffect(D3DXVECTOR3 pos, D3DXCOLOR col, float fRadius);
+	void Set2Dpolygon(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fHeight, D3DXCOLOR col);
+	void SetAlpha(void);
+
+	// ゲッター
+	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 
 private:
 
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;
+	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファ
 	D3DXVECTOR3 m_pos;					// 位置
 	D3DXCOLOR m_col;					// 頂点カラー
 	float m_fAngle;						// 角度
 	float m_fLength;					// 長さ
-	float m_aUV;						// α値
-	float m_zUV;						// ｚ値
-	float m_Width;					// 横のサイズ
-	float m_Height;					// 縦のサイズ
+	float m_Width;						// 横のサイズ
+	float m_Height;						// 縦のサイズ
 	int m_nType;						// 頂点生成の種類 
+	bool m_bAlpha;						// α値の判定
+	int m_nIdx;							// テクスチャ設定用変数
 };
 #endif

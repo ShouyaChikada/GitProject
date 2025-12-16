@@ -18,7 +18,8 @@ public:
 	typedef enum
 	{
 		ROT_NONE = 0,
-		ROT_ON,
+		ROT_ON1,
+		ROT_ON2,
 		ROT_OFF,
 		ROT_MAX,
 	}ROT;
@@ -35,6 +36,7 @@ public:
 	// ÉQÉbÉ^Å[
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	D3DXVECTOR3 GetRot(void) { return m_rot; }
+	D3DXVECTOR3 GetRotDest(void) { return m_rotDest; }
 	D3DXVECTOR3 GetVecAxis(void) { return m_VecAxis; }
 	D3DXVECTOR3 GetSize(void) { return m_Size; }
 	float GetValueRot(void) { return m_fValueRot; }
@@ -46,6 +48,7 @@ public:
 	void SetVecAxis(D3DXVECTOR3 VecAxis) { m_VecAxis = VecAxis; }
 	void SetValueRot(float fValueRot) { m_fValueRot = fValueRot; }
 	void SetIdx(std::string Path);
+	void SetSize(D3DXVECTOR3 size) { m_Size = size; }
 	void SetRotaiton(ROT rotation) { m_Rotation = rotation; }
 
 private:

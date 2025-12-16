@@ -39,18 +39,20 @@
 //========================================
 //マクロ定義
 //========================================
-#define CLASS_NAME "WindowsClass"													//ウィンドウクラスの名前
-#define WINDOW_NAME "DirectXの基本処理"												//ウィンドウの名前(キャプションに表示)
-#define SCREEN_WIDTH (1280)															//ウィンドウの幅
-#define SCREEN_HEIGHT (720)															//ウィンドウの高さ
-#define FVF_VERTEX_2D (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)				//頂点フォーマット[2D]
-#define FVF_VERTEX_3D (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	//座標・法線・カラー・テクスチャ
+#define CLASS_NAME "WindowsClass"													// ウィンドウクラスの名前
+#define WINDOW_NAME "DirectXの基本処理"												// ウィンドウの名前(キャプションに表示)
+#define SCREEN_WIDTH (1280)															// ウィンドウの幅
+#define SCREEN_HEIGHT (720)															// ウィンドウの高さ
+#define FVF_VERTEX_2D (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)				// 頂点フォーマット[2D]
+#define FVF_VERTEX_3D (D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 座標・法線・カラー・テクスチャ
 #define D3DFVF_VERTEX (D3DFVF_XYZ | D3DFVF_DIFFUSE)										
-#define MAX_TEXTURE (128)															//テクスチャの最大数
-#define MAX_BLOCK (16)																//ブロックの最大数
+#define MAX_TEXTURE (128)															// テクスチャの最大数
+#define MAX_BLOCK (16)																// ブロックの最大数
 #define MAX_MODEL (32)																// 最大モデル数
-#define MAX_PMODEL (15)																//プレイヤーの最大モデル数
-#define MAX_HMODEL (15)																//人の最大モデル数
+#define MAX_PMODEL (15)																// プレイヤーの最大モデル数
+#define MAX_HMODEL (15)																// 人の最大モデル数
+#define D3DX_VEC3 (D3DXVECTOR3(0.0f,0.0f,0.0f))										// 位置のマクロ
+#define D3DX_COL (D3DXCOLOR(1.0f,1.0f,1.0f,1.0f))									// カラーのマクロ
 
 typedef struct
 {

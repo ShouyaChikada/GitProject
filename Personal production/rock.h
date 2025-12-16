@@ -13,8 +13,9 @@
 #include <string>
 
 // マクロ定義
-#define MAX_SPEED (5.0f)
-#define MAX_ROT (0.175f)
+#define MAX_SPEED (15.0f)	// 移動の速さ
+#define MAX_ROT (0.175f)	// クオータニオンの回転値
+#define HALF (0.5f)			// 半分の値
 
 // クラス
 class CRock :public CObjectX
@@ -27,16 +28,21 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	void SetInput(D3DXVECTOR3 pos);
 
-	static CRock* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, std::string Path, CObjectX::ROT rotation);
+	static CRock* Create(D3DXVECTOR3 pos, ROT Rot, CObjectX::ROT rotation, TYPE type);
+
+	void Collision(D3DXVECTOR3* pos, D3DXVECTOR3* posOld, D3DXVECTOR3* move, D3DXVECTOR3* size);
+	void MoveInput(void);
+
+	// ゲッター
+	D3DXVECTOR3 GetMove(void) { return m_move; }
+
+	// セッター
+	void SetMove(D3DXVECTOR3 move) { m_move = move; }
 
 private:
-	D3DXVECTOR3 m_rotDest;						// 目的の向き
-	D3DXVECTOR3 m_pos;							// 位置
-	D3DXVECTOR3 m_posOld;						// 目的の位置
-	D3DXVECTOR3 m_move;							// 移動量
-	float m_Diff;								// 差分
-
+	D3DXVECTOR3 m_move;			// 移動量
+	D3DXVECTOR3 m_CollisionPos;	//　当たり判定用位置
+	D3DXVECTOR3 m_CollisionSize;//	当たり判定用サイズ
 };
 #endif

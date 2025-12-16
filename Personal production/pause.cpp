@@ -49,7 +49,6 @@ CPause* CPause::Create(D3DXVECTOR3 pos, D3DXCOLOR col, float fX, float fY, std::
 // ‰Šú‰»
 HRESULT CPause::Init(void)
 {
-	CTextureManager* pTex = CManager::GetTexManager();
 	m_nIdx = CTextureManager::Instance()->Register(m_aName);
 
 	CObject::SetType(TYPE_PAUSE);

@@ -8,7 +8,7 @@
 #include "renderer.h"
 #include "camera.h"
 #include "manager.h"
-//#include "game.h"
+#include "game.h"
 
 //静的メンバ変数
 CObject* CObject::m_apTop[NUM_PRIORITY] = {};
@@ -116,29 +116,22 @@ void CObject::UpdateAll(void)
 			// 次のオブジェクトを保存
 			CObject* pObjectNext = pObject->m_pNext;
 
-			//if (CPauseManager::GetPause())
-			//{
-			//	if (pObject->GetType() == TYPE_PAUSE)
-			//	{
-			//		// 更新処理
-			//		pObject->Update();
-			//	}
-			//}
-			//else
-			//{
-			//	// 死亡フラグが立っていたら
-			//	if (pObject->m_bDeath == false)
-			//	{
-			//		// 更新処理
-			//		pObject->Update();
-			//	}
-			//}
-
-			 //死亡フラグが立っていたら
-			if (pObject->m_bDeath == false)
+			if (CPauseManager::GetPause())
 			{
-				// 更新処理
-				pObject->Update();
+				if (pObject->GetType() == TYPE_PAUSE)
+				{
+					// 更新処理
+					pObject->Update();
+				}
+			}
+			else
+			{
+				// 死亡フラグが立っていたら
+				if (pObject->m_bDeath == false)
+				{
+					// 更新処理
+					pObject->Update();
+				}
 			}
 
 			//次のオブジェクトを代入
@@ -245,61 +238,6 @@ void CObject::SetType(TYPE type)
 CObject::TYPE CObject::GetType(void)
 {
 	return m_type;
-}
-// サイズの取得
-D3DXVECTOR3 CObject::SetSize(D3DXVECTOR3 VtxMax, D3DXVECTOR3 VtxMin, int nNumVtx, DWORD sizeFVF, BYTE* pVtxBuff)
-{
-	D3DXVECTOR3 Size;
-
-	// 頂点数分回す
-	for (int nCntBlock = 0; nCntBlock < nNumVtx; nCntBlock++)
-	{
-		// 頂点座標の代入
-		D3DXVECTOR3 Vtx = *(D3DXVECTOR3*)pVtxBuff;
-
-		// 頂点座標の比較
-		if (Vtx.x > VtxMax.x)
-		{// xが最大値より大きかったら
-			// 代入
-			VtxMax.x = Vtx.x;
-		}
-		if (Vtx.y > VtxMax.y)
-		{// yが最大値より大きかったら
-			// 代入
-			VtxMax.y = Vtx.y;
-		}
-		if (Vtx.z > VtxMax.z)
-		{// zが最大値より大きかったら
-			// 代入
-			VtxMax.z = Vtx.z;
-		}
-
-		if (Vtx.x < VtxMin.x)
-		{// xが最小値より小さかったら
-			// 代入
-			VtxMin.x = Vtx.x;
-		}
-		if (Vtx.y < VtxMin.y)
-		{// yが最小値より小さかったら
-			// 代入
-			VtxMin.y = Vtx.y;
-		}
-		if (Vtx.z < VtxMin.z)
-		{// zが最小値より小さかったら
-			// 代入
-			VtxMin.z = Vtx.z;
-		}
-
-		// 頂点フォーマットのサイズ分進める
-		pVtxBuff += sizeFVF;
-	}
-
-	// サイズを代入する
-	Size.x = VtxMax.x - VtxMin.x;	// sizeのx
-	Size.y = VtxMax.y - VtxMin.y;	// sizeのy
-	Size.z = VtxMax.z - VtxMin.z;	// sizeのz
-
-	return Size;
 }
 
 //先頭アドレスの取得

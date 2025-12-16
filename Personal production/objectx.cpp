@@ -167,8 +167,21 @@ void CObjectX::Uninit(void)
 //================================================
 void CObjectX::Update(void)
 {
+	//角度の調整
+	m_Diff = m_rotDest.y - m_rot.y;
+
+	// 角度の正規化
+	if (m_Diff < -D3DX_PI)
+	{
+		m_Diff = m_Diff + (D3DX_PI * 2);
+	}
+	else if (m_Diff > D3DX_PI)
+	{
+		m_Diff = m_Diff - (D3DX_PI * 2);
+	}
+
 	// 回転するなら
-	if (m_Rotation == ROT_ON)
+	if (m_Rotation == ROT_ON1)
 	{
 		D3DXVECTOR3 Axis = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
 
@@ -176,6 +189,19 @@ void CObjectX::Update(void)
 
 		D3DXQuaternionRotationAxis(&m_Quat, &Axis, m_fAngle);
 	}
+	else if (m_Rotation == ROT_ON2)
+	{
+		// 回転軸のおける指定の回転角からクォータニオンを作成
+		D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
+
+	}
+
+	//前回の位置を保存	位置更新の上で書く
+	m_posOld = m_pos;
+
+	m_rot.y += m_Diff * 0.25f;
+
+
 }
 //================================================
 // 描画処理
@@ -195,27 +221,37 @@ void CObjectX::Draw(void)
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	// 回転しないなら
-	if (m_Rotation != ROT_ON)
+	// 回転するなら
+	if(m_Rotation == ROT_ON1 || m_Rotation == ROT_ON2)
 	{
-		// 回転軸のおける指定の回転角からクォータニオンを作成
-		D3DXQuaternionRotationAxis(&m_Quat, &m_VecAxis, m_fValueRot);
+
+		// クォータニオンから回転マトリックスの作成
+		D3DXMatrixRotationQuaternion(&mtxRot, &m_Quat);
+
+		// 現在の回転量に次の回転量を加える
+		D3DXMatrixMultiply(&m_mtxRot, &m_mtxRot, &mtxRot);
+
+		// 次の回転量をワールドマトリックスの加える
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxRot);
+
+		// 位置のマトリックスの作成
+		D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+
+		// ワールドマトリックスに位置のマトリックスを加える
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
 	}
+	else
+	{
+		//向きを反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	// クォータニオンから回転マトリックスの作成
-	D3DXMatrixRotationQuaternion(&mtxRot, &m_Quat);
+		//位置を反映
+		D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+		D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
-	// 現在の回転量に次の回転量を加える
-	D3DXMatrixMultiply(&m_mtxRot, &m_mtxRot, &mtxRot);
-	
-	// 次の回転量をワールドマトリックスの加える
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxRot);
-
-	// 位置のマトリックスの作成
-	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
-
-	// ワールドマトリックスに位置のマトリックスを加える
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	}
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

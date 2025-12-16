@@ -14,7 +14,6 @@
 //マクロ
 #define BULLET_WIDTH (60.0f)	//弾の横のサイズ
 #define BULLET_HEIGHT (60.0f)	//弾の縦のサイズ
-#define MAX_BULLET (128)
 
 //クラス設計
 class CBullet:public CBillboard
@@ -27,19 +26,19 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CBullet* Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, float fRadius, std::string Path);
+	static CBullet* Create(D3DXVECTOR3 pos, D3DXVECTOR3 move);
 
-	bool CollisionEnemy(D3DXVECTOR3 pos);
-
-	void CharngeMove(void);
+	void FollowingMove(void);
 
 private:
 
-	D3DXVECTOR3 m_pos;						// 弾の位置
-	D3DXVECTOR3 m_rot;						// 弾の向き
-	D3DXVECTOR3 m_move;						// 弾の移動
-	int m_lifetime;							// 弾の寿命
-	int m_nIdx;								// インデックス用変数
+	D3DXVECTOR3 m_pos;	// 弾の位置
+	D3DXVECTOR3 m_rot;	// 弾の向き
+	D3DXVECTOR3 m_move;	// 弾の移動
+	float m_fSpeed;		// 速さ
+	int m_nLife;		// 弾の寿命
+	int m_nMoveTime;	// 生成されてから動き出すまでのCT
+	int m_nIdx;			// インデックス用変数
 };
 
 #endif

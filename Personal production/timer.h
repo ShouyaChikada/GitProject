@@ -40,6 +40,8 @@ public:
 	int GetNs(void);
 	int GetMin(void);
 	int GetTime(void) { return m_nTime; };
+	static int GetSecond(void) { return m_nSecond; }
+	static int GetMinute(void) { return m_nMinute; }
 	static int GetTimer(void) { return m_nTimer; };
 
 private:
@@ -51,6 +53,8 @@ private:
 	int m_nNs;								// 秒
 	int m_nMin;								// 分
 	int m_nHour;							// 時
+	static int m_nSecond;					// 静的秒用の変数
+	static int m_nMinute;					// 静的分用の変数
 	static int m_nTimer;					// タイマーの取得
 };
 

@@ -222,11 +222,10 @@ void CCamera::Update(void)
 	//	
 	//}
 #else
-	//Ž‹“_‚Ìù‰ñ(¶)
-	if (pInputKeyboard->GetPress(DIK_Q) == true)
+	if (m_bFlattery == false)
 	{
-		m_rot.y -= 0.05f;
-		//Šp“x‚Ì³‹K‰»
+		MouseView(pInputMouse);
+
 		// ³‹K‰»
 		if (m_rot.y > D3DX_PI)
 		{
@@ -235,20 +234,48 @@ void CCamera::Update(void)
 		else if (m_rot.y < -D3DX_PI)
 		{
 			m_rot.y += D3DX_PI * 2.0f;
+		}
+		if (m_rot.x > D3DX_PI)
+		{
+			m_rot.x -= D3DX_PI * 2.0f;
+		}
+		else if (m_rot.x < -D3DX_PI)
+		{
+			m_rot.x += D3DX_PI * 2.0f;
 		}
 	}
-	//Ž‹“_‚Ìù‰ñ(‰E)
-	if (pInputKeyboard->GetPress(DIK_E) == true)
+	else
 	{
-		m_rot.y += 0.05f;
-		// ³‹K‰»
-		if (m_rot.y > D3DX_PI)
+
+
+		//Ž‹“_‚Ìù‰ñ(¶)
+		if (pInputKeyboard->GetPress(DIK_Q) == true)
 		{
-			m_rot.y -= D3DX_PI * 2.0f;
+			m_rot.y -= 0.05f;
+			//Šp“x‚Ì³‹K‰»
+			// ³‹K‰»
+			if (m_rot.y > D3DX_PI)
+			{
+				m_rot.y -= D3DX_PI * 2.0f;
+			}
+			else if (m_rot.y < -D3DX_PI)
+			{
+				m_rot.y += D3DX_PI * 2.0f;
+			}
 		}
-		else if (m_rot.y < -D3DX_PI)
+		//Ž‹“_‚Ìù‰ñ(‰E)
+		if (pInputKeyboard->GetPress(DIK_E) == true)
 		{
-			m_rot.y += D3DX_PI * 2.0f;
+			m_rot.y += 0.05f;
+			// ³‹K‰»
+			if (m_rot.y > D3DX_PI)
+			{
+				m_rot.y -= D3DX_PI * 2.0f;
+			}
+			else if (m_rot.y < -D3DX_PI)
+			{
+				m_rot.y += D3DX_PI * 2.0f;
+			}
 		}
 	}
 
@@ -416,9 +443,9 @@ void CCamera::MouseView(CInputMouse* pMouse)
 void CCamera::SetFollowing(D3DXVECTOR3 pos, D3DXVECTOR3 rotDest)
 {
 	////’Ž‹“_‚Ì–Ú“I
-	//m_posRDest.x = pos.x + sinf(rotDest.y) * MAX_SPEED;
-	//m_posRDest.y = pos.y + cosf(rotDest.y) * MAX_SPEED;
-	//m_posRDest.z = pos.z + cosf(rotDest.y) * MAX_SPEED;
+	//m_posRDest.x = pos.x + sinf(rotDest.y) * 15.0f;
+	//m_posRDest.y = pos.y + cosf(rotDest.y) * 15.0f;
+	//m_posRDest.z = pos.z + cosf(rotDest.y) * 15.0f;
 
 	////Ž‹“_‚Ì–Ú“I
 	//m_posVDest.x = pos.x - sinf(m_rot.y) * m_fDistance;

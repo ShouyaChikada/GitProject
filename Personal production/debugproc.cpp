@@ -46,10 +46,10 @@ void CDebugProc::Init(void)
 // I—¹
 void CDebugProc::Uninit(void)
 {
-	if (m_pFont != NULL)
+	if (m_pFont != nullptr)
 	{
 		m_pFont->Release();
-		m_pFont = NULL;
+		m_pFont = nullptr;
 	}
 }
 
@@ -76,7 +76,7 @@ void CDebugProc::Print(const char* fmt, ...)
 // •`‰æ
 void CDebugProc::Draw(int aWidth,int aHeight)
 {
-#if 0
+#ifdef _DEBUG
 
 
 	if (m_Enable == true)

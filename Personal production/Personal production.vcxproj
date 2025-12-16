@@ -153,11 +153,15 @@
     <ClCompile Include="block.cpp" />
     <ClCompile Include="blockmanager.cpp" />
     <ClCompile Include="bullet.cpp" />
+    <ClCompile Include="bulletmanager.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="cmeteorock.cpp" />
     <ClCompile Include="debugproc.cpp" />
+    <ClCompile Include="effect.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="gameui.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="jimen.cpp" />
     <ClCompile Include="light.cpp" />
@@ -165,6 +169,7 @@
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="meshcylinder.cpp" />
     <ClCompile Include="meshfield.cpp" />
+    <ClCompile Include="meteopillar.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modelmanager.cpp" />
     <ClCompile Include="motion.cpp" />
@@ -173,6 +178,7 @@
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectx.cpp" />
+    <ClCompile Include="particle.cpp" />
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="pauseanager.cpp" />
     <ClCompile Include="pch.cpp">
@@ -185,6 +191,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="resultmanager.cpp" />
     <ClCompile Include="rock.cpp" />
+    <ClCompile Include="rockmanager.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shadows.cpp" />
     <ClCompile Include="texturemanager.cpp" />
@@ -197,11 +204,16 @@
     <ClInclude Include="block.h" />
     <ClInclude Include="blockmanager.h" />
     <ClInclude Include="bullet.h" />
+    <ClInclude Include="bulletmanager.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="cmeteorock.h" />
     <ClInclude Include="debugproc.h" />
+    <ClInclude Include="easing.h" />
+    <ClInclude Include="effect.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="gameui.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="jimen.h" />
     <ClInclude Include="light.h" />
@@ -209,6 +221,7 @@
     <ClInclude Include="manager.h" />
     <ClInclude Include="meshcylinder.h" />
     <ClInclude Include="meshfield.h" />
+    <ClInclude Include="meteopillar.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modelmanager.h" />
     <ClInclude Include="motion.h" />
@@ -217,6 +230,7 @@
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
     <ClInclude Include="objectx.h" />
+    <ClInclude Include="particle.h" />
     <ClInclude Include="pause.h" />
     <ClInclude Include="pausemanager.h" />
     <ClInclude Include="pch.h" />
@@ -226,6 +240,7 @@
     <ClInclude Include="result.h" />
     <ClInclude Include="resultmanager.h" />
     <ClInclude Include="rock.h" />
+    <ClInclude Include="rockmanager.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shadows.h" />
     <ClInclude Include="texturemanager.h" />

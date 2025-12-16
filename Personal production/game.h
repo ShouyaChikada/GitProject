@@ -23,6 +23,8 @@
 #include "timer.h"
 #include "pausemanager.h"
 #include "blockmanager.h"
+#include "bulletmanager.h"
+#include "rockmanager.h"
 
 class CGame :public CScene
 {
@@ -46,6 +48,8 @@ public:
 	static bool GetCheck(void) { return m_bCheck; }
 	static CModel** GetModel1(void) { return &m_pModel1[0]; }
 	static CBlockManager* GetBlockManager(void){ return m_pBlockManager; }
+	static CBulletManager* GetBulletManager(void) { return m_pBulletManager; }
+	static CRockManager* GetRockManager(void) { return m_pRockManager; }
 
 private:
 	static CPlayer* m_pPlayer;					// プレイヤーのポインタ
@@ -58,6 +62,8 @@ private:
 	static CPauseManager* m_pPauseManager;		// ポーズマネージャーのポインタ
 	static CModel* m_pModel1[MAX_HMODEL];		// モデルのポインタ
 	static CBlockManager* m_pBlockManager;		// ブロックマネージャーのポインタ
+	static CBulletManager* m_pBulletManager;	// バレットマネージャーのポインタ
+	static CRockManager* m_pRockManager;		// ロック(隕石)のポインタ
 	static bool m_bCheck;						// ゴール判定
 };
 
